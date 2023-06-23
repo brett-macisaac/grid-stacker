@@ -1,0 +1,204 @@
+:root
+{
+    --colour-page: #323241;
+    --colour-text: white;
+    --colour-button: black;
+
+    --colour-experiment: #444455;
+
+    --height-header: 50px;
+    --height-footer: 80px
+}
+
+*
+{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    overflow: 'hidden';
+
+    color: var(--colour-text);
+    font-family: Verdana, Roboto, "Courier New", Tahoma, sans-serif;
+}
+
+html
+{
+    height: 100%;
+}
+
+body
+{
+    min-height: 100%;
+    max-height: 100%;
+    background: var(--colour-page);
+}
+
+#root
+{
+    width: 100%;
+}
+
+.pageHeading
+{
+    /* Centre the text */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+/* 
+    position: sticky;
+    top: 0; */
+
+    width: 100%;
+    height: var(--height-header);
+
+    font-size: 25px;
+
+    /* Old vertical centering technique */
+    /* line-height: var(--height-header); */
+
+    padding-left: 1.25em;
+
+    background-color: var(--colour-button);
+}
+
+.pageContainer
+{
+    width: 100%;
+}
+
+.content
+{
+    height: calc(100vh - var(--height-footer) - var(--height-header));
+    width: 100%;
+    overflow: scroll;
+
+    /* margin: auto !important; */
+
+    font-size: 16px;
+
+    padding-bottom: 30px;
+}
+
+.footer
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    width: 100%;
+
+    background-color: black;
+
+    height: var(--height-footer);
+}
+
+h2
+{
+    text-align: center;
+
+    font-size: 20px;
+
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+div, body
+{
+    display: flex;
+    /* flex-direction: column; */
+    /* width: fit-content; */
+}
+
+div
+{
+    flex-direction: column;
+}
+
+.clearFix::after
+{
+    content: ".";
+
+    display: block;
+
+    clear: both;
+
+    visibility: hidden;
+
+    line-height: 0;
+
+    height: 0;
+}
+
+.btnBig
+{
+    display: block;
+
+    width: 90%;
+    max-width: 500px;
+
+    margin: auto;
+
+    padding: 10px 0;
+
+    background-color: var(--colour-button);
+
+    font-size: 20px;
+    font-weight: 600;
+
+    border: none;
+    border-radius: 20px;
+}
+
+#btnNext, #btnStart
+{
+    background-color: var(--colour-page);
+    color: white;
+}
+
+.btnBig:hover
+{
+    border-color: var(--colour-text);
+}
+
+.btnBig:active
+{
+    background-color: var(--colour-page);
+}
+
+/* Prevent the scrollbar from being displayed in WebKit based browsers (Safari, Chrome, Opera, etc). */
+.hideScrollBar::-webkit-scrollbar
+{
+    display: none;
+}
+
+/* Prevents the scrollbar from being displayed in WebKit based browsers (FireFox, IE, Edge). */
+.hideScrollBar
+{
+    /* Firefox */
+    scrollbar-width: none;
+
+    /* IE 10+ and Edge */
+    -ms-overflow-style: none;
+}
+
+/* Placeholder text styling. */
+::placeholder /* Chrome, Firefox, Opera, Safari 10.1+ */
+{ 
+    opacity: 0.8;
+}
+:-ms-input-placeholder /* Internet Explorer 10-11 */
+{
+    opacity: 0.8;
+}
+::-ms-input-placeholder /* Microsoft Edge */
+{
+    opacity: 0.8;
+}
+
+/* Prevent text selection. */
+.unselectable 
+{
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
