@@ -10,20 +10,12 @@ import Grid from '../../classes/Grid';
 import Block from '../../classes/Block';
 import GridDisplayer from '../../components/grid_displayer/GridDisplayer.jsx';
 import GridChar from '../../classes/GridChar';
+import GridSymbol from '../../classes/GridSymbol';
 import ButtonBlocks from '../../components/button_blocks/ButtonBlocks';
 import TextBlocks from '../../components/text_blocks/TextBlocks';
 import utils from '../../utils/utils';
 import consts from '../../utils/constants';
 import ThemeContext from "../../contexts/ThemeContext.js";
-
-/*
-* AsyncStorage keys for the top, middle, and bottom balls.
-*/
-const lclStrgKeyBallsTop = "MenuBallsTop";
-const lclStrgKeyBallsMid = "MenuBallsMid";
-const lclStrgKeyBallsBottom = "MenuBallsBottom";
-
-//const GridG = new GridChar('G');
 
 function Menu({}) 
 {
@@ -70,10 +62,10 @@ function Menu({})
             {/* Title */}
             <TextBlocks prText = "GRID STACKER" prSizeText = { 50 } prColourBackground = { theme.emptyGridCell } prStyle = {{ justifyContent: "center" }} />
 
-            <ButtonBlocks text = "<" onPress = { () => { console.log("Hello") } } prSizeText = { 50 } prColourBackground = { theme.buttonContent } style = {{ padding: 10 }} />
+            {/* <ButtonBlocks text = "<" onPress = { () => { console.log("Hello") } } prSizeText = { 50 } prColourBackground = { theme.buttonContent } style = {{ padding: 10 }} /> */}
 
             {/* Create a 'BlockSymbol' component for displaying non-standard symbols, such as arrows. */}
-            <ButtonBlocks text = "^" onPress = { () => { console.log("Hello") } } prSizeText = { 50 } prColourBackground = { theme.buttonContent } style = {{ padding: 10 }} />
+            {/* <ButtonBlocks text = "^" onPress = { () => { console.log("Hello") } } prSizeText = { 50 } prColourBackground = { theme.buttonContent } style = {{ padding: 10 }} /> */}
 
             {/* Put stats here: e.g. "Number of games you've played, number of games played by everyone, etc." */}
             

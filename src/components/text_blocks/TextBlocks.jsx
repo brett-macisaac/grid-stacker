@@ -6,7 +6,7 @@ import globalProps, { utilsGlobalStyles } from '../../styles';
 import GridDisplayer from "../grid_displayer/GridDisplayer.jsx";
 import GridChar from "../../classes/GridChar.js";
 
-function TextBlocks({ prText, prSizeText, prStyle, prColourBackground, prColourEmptyCell, prColourText, prColourBorder })
+function TextBlocks({ prText, prSizeText, prStyle, prIsHorizontal, prColourBackground, prColourEmptyCell, prColourText, prColourBorder })
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -29,7 +29,14 @@ function TextBlocks({ prText, prSizeText, prStyle, prColourBackground, prColourE
                     (pWordGridified, pIndex) =>
                     {
                         return (
-                            <div key  = {pIndex } index = { pIndex } style = {{ width: "fit-content", flexDirection: "row", columnGap: prSizeText * 0.14 }}>
+                            <div 
+                                key  = {pIndex } 
+                                style = {{ 
+                                    flexDirection: prIsHorizontal ? "row" : "column", 
+                                    columnGap: prSizeText * 0.14,
+                                    rowGap: prSizeText * 0.20
+                                }}
+                                >
                                 {
                                     pWordGridified.map(
                                         (pCharGridified, pIndex2) =>
@@ -69,6 +76,7 @@ TextBlocks.propTypes =
 {
     prText: PropTypes.string.isRequired,
     prSizeText: PropTypes.number,
+    prIsHorizontal: PropTypes.bool,
     prColourBackground: PropTypes.string,
     prColourText: PropTypes.string,
     prColourBorder: PropTypes.string
@@ -76,6 +84,7 @@ TextBlocks.propTypes =
 
 TextBlocks.defaultProps =
 {
+    prIsHorizontal: true,
     prSizeText: 40
 }
 

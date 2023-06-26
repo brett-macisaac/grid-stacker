@@ -28,7 +28,7 @@ import globalProps, { utilsGlobalStyles } from '../../styles';
     > styleText: the style of the text within the container. The TextStandard component is used here, so refer to that
                  component's code for information regarding how styling is applied.
 */
-function ButtonBlocks({ text, prSizeText, onPress, onSinglePress, doubleClick, style, prColourBackground, prColourEmptyCell, prColourText, prColourBorder })
+function ButtonBlocks({ text, prSizeText, onPress, onSinglePress, doubleClick, style, prColourBackground, prColourEmptyCell, prColourText, prColourBorder, prIsHorizontal })
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -98,6 +98,7 @@ function ButtonBlocks({ text, prSizeText, onPress, onSinglePress, doubleClick, s
                 prColourBackground = { prColourBackground } 
                 prColourEmptyCell = { prColourEmptyCell } 
                 prColourBorder = { prColourBorder }
+                prIsHorizontal = { prIsHorizontal }
             />
 
         </div>
@@ -112,6 +113,7 @@ ButtonBlocks.propTypes =
     onSinglePress: PropTypes.func,
     doubleClick: PropTypes.bool,
     style: PropTypes.object,
+    prIsHorizontal: PropTypes.bool
 };
 
 ButtonBlocks.defaultProps =
@@ -119,6 +121,7 @@ ButtonBlocks.defaultProps =
     text: "",
     doubleClick: false,
     style: {},
+    prIsHorizontal: true
 }
 
 const styles =

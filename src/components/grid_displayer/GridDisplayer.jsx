@@ -101,7 +101,8 @@ const styles =
         flexWrap: "wrap",
         rowGap: 1,
         columnGap: 1,
-        border: "1px solid"
+        border: "1px solid",
+        flexShrink: 0
     }
 };
 

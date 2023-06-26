@@ -100,9 +100,21 @@ function Debounce(pFunc, pLengthGap)
 function PadEndArray(pArray, pMinLength, pFillValue)
 {
     if (pArray.length >= pMinLength)
-        return;
+        return pArray;
 
     return Object.assign(new Array(pMinLength).fill(pFillValue), pArray);
+}
+
+/*
+* Returns a percentage of a particular value. 
+
+* Parameters:
+    > pPercentage: a number or string which represents the percentage (0-100). If a string, it can be of the form "xx%."
+    > pValue: the value to which a percentage will be calculated.
+*/
+function GetPercentVal(pPercentage, pValue)
+{
+    return (parseInt(pPercentage) / 100) * pValue;
 }
 
 function OrdinalSuffix(aNum)
@@ -146,6 +158,7 @@ const utils =
     GetFromLocalStorage: GetFromLocalStorage,
     Debounce: Debounce,
     PadEndArray: PadEndArray,
+    GetPercentVal: GetPercentVal,
     OrdinalSuffix: OrdinalSuffix,
     CompOps: CompOps
 };

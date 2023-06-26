@@ -114,7 +114,7 @@ function App()
     return (
         <ThemeContext.Provider value = {{ themeName, updateTheme }}>
         <PreferenceContext.Provider value = {{ prefs, updatePrefs }}>
-        <WindowSizeContext.Provider value = { windowSize}>
+        <WindowSizeContext.Provider value = { windowSize }>
             
             <Router>
                 <Routes>
