@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import globalProps, { utilsGlobalStyles } from '../../styles';
 import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
@@ -43,6 +43,7 @@ function Username()
     const [ optionsPopUpMsg, setOptionsPopUpMsg ] = useState(undefined);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(
         () =>
@@ -85,7 +86,7 @@ function Username()
             utils.SetInLocalStorage(gLclStrgKeyPreviousPlayers, [ ...prevPlayers, username ]);
         }
         
-        navigate("/game");
+        navigate("/game", { state: { ...location.state, username: username } });
     };
 
     return ( 
@@ -98,9 +99,19 @@ function Username()
             optionsPopUpMsg = { optionsPopUpMsg }
             style = { styles.container }
         >
-            <TextBlocks prText = "USERNAME" prSizeText = { 35 } prColourBackground = { theme.emptyGridCell } style = {{ justifyContent: "center" }} />
+            <TextBlocks 
+                prText = "USERNAME" 
+                prSizeText = { 35 } 
+                prColourBackground = { theme.emptyGridCell } 
+                style = {{ justifyContent: "center" }} 
+                prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }}
+            />
 
-            <TextStandard text = "Enter your username below. Your username will display beside any high-scores you make." style = {{ textAlign: "center", }} isItalic />
+            <TextStandard 
+                text = "Enter your username below. Your username will display beside any high-scores you make." 
+                style = {{ textAlign: "center", maxWidth: 400 }} 
+                isItalic 
+            />
 
             <TextInputStandard 
                 placeholder = "Username..."

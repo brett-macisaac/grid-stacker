@@ -10,36 +10,45 @@ import WindowSizeContext from './contexts/WindowSizeContext';
 import './App.css';
 import pages from './pages/pages';
 import utils from './utils/utils';
+import consts from './utils/constants';
 import globalProps, { utilsGlobalStyles } from './styles';
+
+/* Ideas
+* Add a preview/summary of the options that the user selects on the game parameters page, in addition to the stats.
+  The container would have the text, "Summary of the selected game". This will allow the user to clearly see what 
+  they've selected before continuing, which is especially useful on mobile screens that can't display everything at 
+  once.
+* Display popular game types on the Menu page. The user should be able to select these game modes and go straight to the
+  username page.
+*/
+
 /*
 * A localStorage key whose value is a string that corresponding to the app's current theme.
 */
 const gLclStrgKeyThemeName = "themeName";
 
 /*
-* A localStorage key whose value is a string that corresponding to the user's game preferences.
-*/
-const gLclStrgKeyPrefs = "gamePreferences";
-
-/*
 * Default game preferences.
 */
-const gPrefsDefault = { cols: 4, rows: 9, username: "", blocks: "IJLOSTZ" };
+const gPrefsDefault = { cols: 4, rows: 9, username: "-", blocks: "IJLOSTZ" };
 
 function App() 
 {
     // Global theme variable.
-    const [ themeName, setThemeName ] = useState(globalProps.themeDefault);
+    const [ themeName, setThemeName ] = useState(utils.GetFromLocalStorage(gLclStrgKeyThemeName, globalProps.themeDefault));
     let theme = globalProps.themes[themeName];
 
+    //Grid.sColourEmptyTile = theme.emptyGridCell;
+
     // Global Preferences variable.
-    const [ prefs, setPrefs ] = useState(gPrefsDefault);
+    const [ prefs, setPrefs ] = useState(utils.GetFromLocalStorage(consts.lclStrgKeyPreferences, gPrefsDefault));
 
     // Global window size variable.
     const [ windowSize, setWindowSize ] = useState({ width: window.innerWidth, height: window.innerHeight });
 
     const updatePrefs = (pPrefPropKey, pPrefPropValue) =>
     {
+        console.log("Updating preference: " + pPrefPropKey);
         if (!prefs.hasOwnProperty(pPrefPropKey))
         {
             console.log("Invalid preference property!");
@@ -50,7 +59,7 @@ function App()
 
         setPrefs(lPrefsNew);
 
-        utils.SetInLocalStorage(gLclStrgKeyPrefs, lPrefsNew);
+        utils.SetInLocalStorage(consts.lclStrgKeyPreferences, lPrefsNew);
     };
 
     const updateWindowSize = () =>
@@ -91,13 +100,14 @@ function App()
     useEffect(
         () =>
         {
-            // Get and set stored theme.
-            const lThemeName = utils.GetFromLocalStorage(gLclStrgKeyThemeName, globalProps.themeDefault);
-            setThemeName(lThemeName);
+            if (!localStorage.getItem(consts.lclStrgKeyTotalTimesPlayed))
+            { utils.SetInLocalStorage(consts.lclStrgKeyTotalTimesPlayed, 0); }
 
-            // Get and set stored preferences.
-            const lPreferences = utils.GetFromLocalStorage(gLclStrgKeyPrefs, gPrefsDefault);
-            setPrefs(lPreferences);
+            if (!localStorage.getItem(consts.lclStrgKeyHighScores))
+            { utils.SetInLocalStorage(consts.lclStrgKeyHighScores, { }); }
+
+            if (!localStorage.getItem(consts.lclStrgKeyTimesPlayed))
+            { utils.SetInLocalStorage(consts.lclStrgKeyTimesPlayed, { }); }
 
             // Set-up an event-listener for window resize.
             window.addEventListener('resize', utils.Debounce(updateWindowSize, 200));
@@ -110,6 +120,17 @@ function App()
         },
         []
     );
+
+    /*
+    * Initialise the values of the contexts,
+    */
+    // useEffect(
+    //     () =>
+    //     {
+    //         Grid.sColourEmptyTile = theme.emptyGridCell;
+    //     },
+    //     [themeName]
+    // );
 
     return (
         <ThemeContext.Provider value = {{ themeName, updateTheme }}>

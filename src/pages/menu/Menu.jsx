@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import globalProps, { utilsGlobalStyles } from '../../styles';
 import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
 
 import ButtonStandard from '../../components/button_standard/ButtonStandard.jsx';
+import TextStandard from '../../components/text_standard/TextStandard';
 import PageContainer from '../../components/page_container/PageContainer.jsx';
 import Grid from '../../classes/Grid';
 import Block from '../../classes/Block';
@@ -12,6 +13,8 @@ import GridDisplayer from '../../components/grid_displayer/GridDisplayer.jsx';
 import GridChar from '../../classes/GridChar';
 import GridSymbol from '../../classes/GridSymbol';
 import ButtonBlocks from '../../components/button_blocks/ButtonBlocks';
+import CountLabel from '../../components/count_label/CountLabel';
+import Container from '../../components/container/Container';
 import TextBlocks from '../../components/text_blocks/TextBlocks';
 import utils from '../../utils/utils';
 import consts from '../../utils/constants';
@@ -25,26 +28,11 @@ function Menu({})
 
     const navigate = useNavigate();
 
-    const [ grid, setGrid ] = useState(new Grid(10, 20));
+    // The total number of games played on this device.
+    const totalGamesLocal = useRef(utils.GetFromLocalStorage(consts.lclStrgKeyTotalTimesPlayed, 0));
 
-    useEffect(
-        () =>
-        {
-            const lBlock = new Block();
-
-            setGrid(
-                (prev) => 
-                {
-                    const lCopy = prev.copy();
-
-                    lCopy.DrawBlockAt(lBlock, Grid.DrawPosition.CentreMid, false);
-
-                    return lCopy;
-                }
-            )
-        },
-        []
-    );
+    // The total number of games played globally by all users. Use an API call to get this value from the database.
+    const totalGamesGlobal = useRef(0);
 
     const handlePlay = () =>
     {
@@ -60,12 +48,26 @@ function Menu({})
             style = { styles.container }
         >
             {/* Title */}
-            <TextBlocks prText = "GRID STACKER" prSizeText = { 50 } prColourBackground = { theme.emptyGridCell } prStyle = {{ justifyContent: "center" }} />
+            <TextBlocks 
+                prText = "GRID STACKER" prSizeText = { 50 } 
+                prColourBackground = { theme.emptyGridCell } 
+                prStyle = {{ ...styles.title, justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
+            />
 
-            {/* <ButtonBlocks text = "<" onPress = { () => { console.log("Hello") } } prSizeText = { 50 } prColourBackground = { theme.buttonContent } style = {{ padding: 10 }} /> */}
+            <Container style = { styles.conGameCount }>
+                <TextStandard text = "Number of Games Played" isItalic />
+                <CountLabel text = "This Device" count = { totalGamesLocal.current } style = { styles.countLabel } />
 
-            {/* Create a 'BlockSymbol' component for displaying non-standard symbols, such as arrows. */}
-            {/* <ButtonBlocks text = "^" onPress = { () => { console.log("Hello") } } prSizeText = { 50 } prColourBackground = { theme.buttonContent } style = {{ padding: 10 }} /> */}
+                <CountLabel text = "Global" count = { totalGamesGlobal.current } style = { styles.countLabel } />
+            </Container>
+
+            {/* Another container that displays popular games on this device. */}
+
+            {/* <TextBlocks 
+                prText = "05 X 10" prSizeText = { 25 } 
+                prColourBackground = { theme.emptyGridCell } 
+                prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 5 }} 
+            /> */}
 
             {/* Put stats here: e.g. "Number of games you've played, number of games played by everyone, etc." */}
             
@@ -75,20 +77,26 @@ function Menu({})
 
 const styles = 
 {
+    title:
+    {
+        marginBottom: utilsGlobalStyles.spacingVertN(1)
+    },
     container:
     {
-        justifyContent: "space-between", 
+        //justifyContent: "space-between", 
+        rowGap: utilsGlobalStyles.spacingVertN(-1),
         alignItems: "center",
     },
-    btnMenu: 
+    conGameCount:
     {
-        maxWidth: globalProps.widthGridPoolBall,
-        width: window.innerWidth * 0.75,
-        borderRadius: globalProps.borderRadiusStandard,
-        paddingTop: 10,
-        paddingBottom: 10,
-        // borderWidth: 1
-    }
+        rowGap: utilsGlobalStyles.spacingVertN(-2),
+        width: "100%",
+        maxWidth: 500
+    },
+    countLabel: 
+    {
+        border: "none"
+    },
 };
 
 export default Menu;

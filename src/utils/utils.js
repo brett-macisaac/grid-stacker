@@ -1,3 +1,20 @@
+function SleepFor(aSleepDuration)
+{
+    if (typeof aSleepDuration !== 'number')
+    {
+        console.log("aSleepDuration must be a number, not " + typeof aSleepDuration);
+        return;
+    } 
+    else if (aSleepDuration < 0)
+    {
+        console.log("aSleepDuration can't be negative.");
+        return;
+    }
+
+    return new Promise (resolve => setTimeout(resolve, aSleepDuration));
+}
+
+
 /*
 * This function returns a random number between aMin and aMax (inclusive of both, i.e. [aMin, aMax]).
 
@@ -152,6 +169,7 @@ const CompOps = Object.freeze(
 
 const utils =
 {
+    SleepFor: SleepFor,
     GetRandom: GetRandom,
     RandomiseArray: RandomiseArray,
     SetInLocalStorage: SetInLocalStorage,

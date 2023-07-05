@@ -6,29 +6,15 @@ class GridSymbol
 {
     #fGrid;
 
+    #fName;
+
+    #fColour;
+
     #fColourRandom;
 
     static sSymbolDefs7x7 = 
     {
-        'arrowLeft': [ 
-            0, 0, 0, 0, 1, 0, 0,
-            0, 0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 1, 0, 0,
-        ],
-        'arrowRight': [ 
-            0, 0, 1, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 1, 0, 0,
-            0, 0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0,
-        ],
-        'arrowLeftDouble': [ 
+        'left': [ 
             0, 0, 0, 1, 1, 1, 0,
             0, 0, 1, 1, 1, 0, 0,
             0, 1, 1, 1, 0, 0, 0,
@@ -37,7 +23,7 @@ class GridSymbol
             0, 0, 1, 1, 1, 0, 0,
             0, 0, 0, 1, 1, 1, 0,
         ],
-        'arrowRightDouble': [ 
+        'right': [ 
             0, 1, 1, 1, 0, 0, 0,
             0, 0, 1, 1, 1, 0, 0,
             0, 0, 0, 1, 1, 1, 0,
@@ -46,7 +32,7 @@ class GridSymbol
             0, 0, 1, 1, 1, 0, 0,
             0, 1, 1, 1, 0, 0, 0,
         ],
-        'arrowLeftDoubleSplit': [ 
+        'leftMax': [ 
             0, 0, 0, 1, 0, 1, 0,
             0, 0, 1, 0, 1, 0, 0,
             0, 1, 0, 1, 0, 0, 0,
@@ -55,7 +41,7 @@ class GridSymbol
             0, 0, 1, 0, 1, 0, 0,
             0, 0, 0, 1, 0, 1, 0,
         ],
-        'arrowRightDoubleSplit': [ 
+        'rightMax': [ 
             0, 1, 0, 1, 0, 0, 0,
             0, 0, 1, 0, 1, 0, 0,
             0, 0, 0, 1, 0, 1, 0,
@@ -64,16 +50,7 @@ class GridSymbol
             0, 0, 1, 0, 1, 0, 0,
             0, 1, 0, 1, 0, 0, 0,
         ],
-        'arrowDown': [
-            0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0, 1,
-            0, 1, 0, 0, 0, 1, 0,
-            0, 0, 1, 0, 1, 0, 0,
-            0, 0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0,
-        ],
-        'arrowDownDouble': [
+        'down': [
             0, 0, 0, 0, 0, 0, 0,
             1, 0, 0, 0, 0, 0, 1,
             1, 1, 0, 0, 0, 1, 1,
@@ -82,7 +59,7 @@ class GridSymbol
             0, 0, 1, 1, 1, 0, 0,
             0, 0, 0, 1, 0, 0, 0,
         ],
-        'arrowDownDoubleSplit': [
+        'downMax': [
             0, 0, 0, 0, 0, 0, 0,
             1, 0, 0, 0, 0, 0, 1,
             0, 1, 0, 0, 0, 1, 0,
@@ -100,7 +77,7 @@ class GridSymbol
             1, 0, 0, 0, 0, 0, 1,
             0, 1, 1, 1, 1, 1, 0,
         ],
-        'antiClockwise': [
+        'anticlockwise': [
             0, 0, 0, 1, 0, 0, 0,
             0, 0, 1, 0, 0, 0, 0,
             0, 1, 1, 1, 1, 1, 0,
@@ -109,7 +86,7 @@ class GridSymbol
             1, 0, 0, 0, 0, 0, 1,
             0, 1, 1, 1, 1, 1, 0,
         ],
-        'reflectionX': [
+        'rotate180': [
             0, 0, 1, 0, 0, 0, 0,
             0, 0, 1, 1, 1, 0, 0,
             0, 0, 0, 0, 0, 0, 0,
@@ -118,7 +95,7 @@ class GridSymbol
             0, 0, 1, 1, 1, 0, 0,
             0, 0, 0, 0, 1, 0, 0,
         ],
-        'blockHold': [
+        'hold': [
             1, 0, 1, 0, 1, 0, 1,
             0, 0, 0, 0, 0, 0, 0,
             1, 0, 1, 0, 0, 0, 1,
@@ -139,10 +116,10 @@ class GridSymbol
 
         this.#fColourRandom = Block.Colours[lBlockTypeRandom];
 
-        let lColour = pColour;
-        if (!lColour)
+        this.#fColour = pColour;
+        if (!(this.#fColour))
         {    
-            lColour = this.#fColourRandom;
+            this.#fColour = this.#fColourRandom;
         }
 
         if (!Object.hasOwn(GridSymbol.sSymbolDefs7x7, pSymbolName))
@@ -150,13 +127,15 @@ class GridSymbol
             pSymbolName = 'arrowLeft';
         }
 
+        this.#fName = pSymbolName;
+
         const lSymbolDef = GridSymbol.sSymbolDefs7x7[pSymbolName];
 
         for (let i = 0; i < lSymbolDef.length; ++i)
         {
             if (lSymbolDef[i] == 1)
             {
-                this.#fGrid.grid[i] = lColour;
+                this.#fGrid.grid[i] = this.#fColour;
             }
         }
     }
@@ -171,6 +150,16 @@ class GridSymbol
         return this.#fGrid;
     }
 
+    get name()
+    {
+        return this.#fName;
+    }
+
+    get colour()
+    {
+        return this.#fColour;
+    }
+
     setColourRandom()
     {
         this.setColour(this.#fColourRandom);
@@ -178,9 +167,11 @@ class GridSymbol
 
     setColour(pColour)
     {
+        this.#fColour = pColour;
+
         for (let i = 0; i < this.#fGrid.grid.length; ++i)
         {
-            if (this.#fGrid.grid[i] != Grid.sColourEmptyTile)
+            if (this.#fGrid.grid[i]) // != undefined
             {
                 this.#fGrid.grid[i] = pColour;
             }

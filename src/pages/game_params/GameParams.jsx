@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { json, useNavigate } from 'react-router-dom';
 
 import globalProps, { utilsGlobalStyles } from "../../styles.js";
 import consts from '../../utils/constants.js';
 import utils from '../../utils/utils.js';
+import utilsAppSpecific from '../../utils/utils_app_specific.js';
 import Grid from '../../classes/Grid';
 import Block from '../../classes/Block';
 import GridDisplayer from '../../components/grid_displayer/GridDisplayer.jsx';
+import TableStandard from '../../components/table_standard/TableStandard.jsx';
 import GridChar from '../../classes/GridChar';
 import TextStandard from '../../components/text_standard/TextStandard.jsx';
+import CountLabel from '../../components/count_label/CountLabel.jsx';
 import CheckBox from '../../components/check_box/CheckBox.jsx';
 import PageContainer from '../../components/page_container/PageContainer.jsx';
 import Container from '../../components/container/Container.jsx';
@@ -39,7 +42,41 @@ function GameParams()
 
     const [blockList, setBlockList] = useState(prefs.blocks);
 
+    const [ highScores, setHighScores ] = useState(
+        {
+            orderColumns: [ "title", "score", "lines", "user" ],
+            header: { title: "STAT", score: "SCORE", lines: "LINES", user:  "USER" },
+            content:
+            {
+                orderRows: [ "highScoreGlobal", "highScoreLocal" ],
+                rows:
+                {
+                    highScoreGlobal: { title: "HI (G)", score: "-", lines: "-", user:  "-" },
+                    highScoreLocal: { title: "HI (L)", score: "-", lines: "-", user:  "-" },
+                }
+            }
+        }
+    );
+
+    const [ timesPlayedLocal, setTimesPlayedLocal ] = useState(0);
+
+    const [ timesPlayedGlobal, setTimesPlayedGlobal ] = useState(0);
+
     const [optionsPopUpMsg, setOptionsPopUpMsg] = useState(undefined);
+
+    useEffect(
+        () =>
+        {
+            // Initialise the grid.
+            // gGrid = new Grid(location.state.cols, location.state.rows);
+            // updateGridState();
+
+            updateStats();
+
+            // Get global (i.e. all-time) high-score for the current dimensions (if connection is possible and the returned value isn't 0).
+        },
+        [ numColumns, numRows, blockList ]
+    );
 
     const selectColumns = (pNumCols) =>
     {
@@ -88,9 +125,53 @@ function GameParams()
         setBlockList(lBlockListNew);
     }
 
+    const updateStats = () =>
+    {
+        const lHighScores = utils.GetFromLocalStorage(consts.lclStrgKeyHighScores);
+        const lTimesPlayedObject = utils.GetFromLocalStorage(consts.lclStrgKeyTimesPlayed);
+
+        const lKeyGridSize = utilsAppSpecific.getGridSizeKey(numColumns, numRows);
+
+        let lTimesPlayedLocal = 0;
+        let lHighScoreLocal = { score: "-", lines: "-", user: "-" };
+        let lHighScoreGlobal = { score: "-", lines: "-", user: "-" };
+
+        // Set local stats.
+        if (blockList in lHighScores && lKeyGridSize in lHighScores[blockList])
+        {
+            lHighScoreLocal.score = lHighScores[blockList][lKeyGridSize].score;
+            lHighScoreLocal.lines = lHighScores[blockList][lKeyGridSize].lines;
+            lHighScoreLocal.user = lHighScores[blockList][lKeyGridSize].user;
+
+            lTimesPlayedLocal = lTimesPlayedObject[blockList][lKeyGridSize]
+        }
+        
+        // Set global stats (if available).
+
+        // Set state variables.
+        setHighScores(
+            (prev) =>
+            {
+                const lCopy = JSON.parse(JSON.stringify(prev));
+
+                lCopy.content.rows.highScoreLocal.score = lHighScoreLocal.score;
+                lCopy.content.rows.highScoreLocal.lines = lHighScoreLocal.lines;
+                lCopy.content.rows.highScoreLocal.user = lHighScoreLocal.user;
+
+                lCopy.content.rows.highScoreGlobal.score = lHighScoreGlobal.score;
+                lCopy.content.rows.highScoreGlobal.lines = lHighScoreGlobal.lines;
+                lCopy.content.rows.highScoreGlobal.user = lHighScoreGlobal.user;
+
+                return lCopy;
+            }
+        );
+
+        setTimesPlayedLocal(lTimesPlayedLocal);
+    };
+
     const handleNext = () =>
     {
-        navigate("/username");
+        navigate("/username", { state: { rows: numRows, cols: numColumns, blocks: blockList } });
     };
 
     return ( 
@@ -103,7 +184,11 @@ function GameParams()
             optionsPopUpMsg = { optionsPopUpMsg }
             style = { styles.container }
         >
-            <TextBlocks prText = "GAME OPTIONS" prSizeText = { 35 } prColourBackground = { theme.emptyGridCell } prStyle = {{ justifyContent: "center" }} />
+            <TextBlocks 
+                prText = "GAME OPTIONS" prSizeText = { 35 } 
+                prColourBackground = { theme.emptyGridCell } 
+                prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
+            />
 
             <div style = { styles.content }>
                 <CountContainer 
@@ -119,15 +204,19 @@ function GameParams()
                             ).map(
                                 (pNumCols, pIndex) =>
                                 {
+                                    const lColourText = pNumCols == numColumns ? theme.selected : gColoursColumnButtons[pIndex];
+
+                                    const lBorder = `1px solid ${pNumCols == numColumns ? theme.selected : theme.header}`
+
                                     return ( 
                                         <ButtonBlocks 
                                             key = { pIndex } 
                                             text = { pNumCols.toString().padStart(2, "0") } 
                                             onPress = { () => { selectColumns(pNumCols); } }
-                                            prColourText = { pNumCols == numColumns ? theme.selected : undefined }
+                                            prColourText = { lColourText }
                                             prColourBackground = { theme.header }
                                             style = {{ 
-                                                border: pNumCols == numColumns ? `1px solid ${theme.selected}` : undefined,
+                                                border: lBorder,
                                                 padding: 5
                                             }}
                                         /> 
@@ -140,7 +229,7 @@ function GameParams()
 
                 <CountContainer 
                     title = "Number of Rows" count = { numRows } size = { 1 }
-                    styleInner = {{ ...styles.conGridDimension }}
+                    styleInner = {{ ...styles.conOption }}
                 >
                     <TextStandard text = "Select the number of rows" isItalic style = { styles.prompt } />
 
@@ -151,16 +240,20 @@ function GameParams()
                             ).map(
                                 (pNumRows, pIndex) =>
                                 {
+                                    const lColourText = pNumRows == numRows ? theme.selected : gColoursRowButtons[pIndex];
+
+                                    const lBorder = `1px solid ${pNumRows == numRows ? theme.selected : theme.header}`
+
                                     return ( 
                                         <ButtonBlocks 
                                             key = { pIndex }
                                             index = { pIndex } 
                                             text = { pNumRows.toString().padStart(2, "0") } 
                                             onPress = { () => { selectRows(pNumRows); } }
-                                            prColourText = { pNumRows == numRows ? theme.selected : undefined }
+                                            prColourText = { lColourText }
                                             prColourBackground = { theme.header }
                                             style = {{ 
-                                                border: pNumRows == numRows ? `1px solid ${theme.selected}` : undefined,
+                                                border: lBorder,
                                                 padding: 5
                                             }}
                                         /> 
@@ -178,7 +271,7 @@ function GameParams()
                             Object.keys(Block.Type).map(
                                 (pBlockType, pIndex) =>
                                 {
-                                    const lGrid = new Grid(5, 5);
+                                    const lGrid = new Grid(4, 4);
 
                                     const lBlock = new Block(pBlockType);
 
@@ -202,6 +295,24 @@ function GameParams()
                             )
                         }
                     </div>
+                </Container>
+
+                <Container style = { styles.conStats }>
+                    <TextStandard text = "Stats for the selected game." isItalic />
+
+                    <TableStandard 
+                        prData = { highScores }
+                        prStyleTable = {{ backgroundColor: theme.content }}
+                        //prBorderColour = { theme.borders }
+                        prBorderSize = { 3 }
+                        prStyleCellHeader = {{ backgroundColor: theme.buttonContent }}
+                        prStyleCellContent = {{ backgroundColor: theme.buttonContent }}
+                        //prStyleColumn = {{ backgroundColor: theme.content }}
+                    />
+
+                    <CountLabel text = "Games (Local)" count = { timesPlayedLocal } style = { styles.countLabel } />
+
+                    <CountLabel text = "Games (Global)" count = { timesPlayedGlobal } style = { styles.countLabel } />
                 </Container>
 
                 {/* Display stats for this game, such as number of times played and high-score. */}
@@ -235,6 +346,7 @@ const styles =
     conOption: 
     {
         alignItems: "center",
+        paddingTop: utilsGlobalStyles.spacingVertN(-1)
     },
     conGridDimension:
     {
@@ -249,10 +361,38 @@ const styles =
     {
         flexDirection: "column"
     },
+    conStats:
+    {
+        rowGap: utilsGlobalStyles.spacingVertN(-1)
+    },
+    tableHighScore:
+    {
+        //width: "fit-content",
+        //alignSelf: "center"
+    },
     conBlocksInner:
     {
-        flexDirection: "row", flexWrap: "wrap", columnGap: 20, rowGap: 10, justifyContent: "center"
+        flexDirection: "row", flexWrap: "wrap", columnGap: 10, rowGap: 10, justifyContent: "center"
+    },
+    countLabel: 
+    {
+        border: "none"
     }
 };
+
+const gColoursColumnButtons = Array.from({ length: gRngCols.max - gRngCols.min + 1 }, (el, i) => { return i }).map(
+    (pIDC) =>
+    {
+        return utilsAppSpecific.getRandomBlockColour();
+    }
+);
+
+const gColoursRowButtons = Array.from({ length: gRngRows.max - gRngRows.min + 1 }, (el, i) => { return i }).map(
+    (pIDC) =>
+    {
+        return utilsAppSpecific.getRandomBlockColour();
+    }
+);
+
 
 export default GameParams;

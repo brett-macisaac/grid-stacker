@@ -8,6 +8,7 @@ import Container from '../../components/container/Container';
 import TextStandard from '../../components/text_standard/TextStandard';
 import PageContainer from '../../components/page_container/PageContainer';
 import ThemeContext from '../../contexts/ThemeContext';
+import TextBlocks from '../../components/text_blocks/TextBlocks';
 
 function GameInfo() 
 {
@@ -25,275 +26,208 @@ function GameInfo()
             style = { styles.container }
         >
 
-            <Container>
+            <TextBlocks 
+                prText = "ABOUT" prSizeText = { 35 } 
+                prColourBackground = { theme.emptyGridCell } 
+                prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
+            />
+
+            <Container style = { styles.conText }>
 
                 <TextStandard 
-                    text = "What You Need"
+                    text = "What is Grid Stacker?"
                     size = { 2 }
                     isBold
                     style = { styles.title1 }
                 />
                 <TextStandard 
-                    text = "- A pool or snooker table."
+                    text = {
+`Grid Stacker is a web-based game that takes inspiration from other 'falling-blocks' games like Tetris and similar 
+alternatives.`
+                    }
                     style = { styles.paragraph }
+                    removeLineBreaks
                 />
                 <TextStandard 
-                    text = "- A set of pool balls (numbered 1 to 15)."
+                    text = {
+`Unlike many other games in the genre, particularly newer incarnations, in Grid Stacker there is but one goal: to stack 
+the blocks and score as many points until you lose. No special modes, simply stack until you die.`
+                    }
                     style = { styles.paragraph }
-                />
-                <TextStandard 
-                    text = "- At least one pool cue."
-                    style = { styles.paragraph }
+                    removeLineBreaks
                 />
 
             </Container>
 
-            <Container>
+            <Container style = { styles.conText }>
                 <TextStandard 
-                    text = "Number of Players"
+                    text = "Who Created Grid Stacker?"
                     size = { 2 }
                     isBold
                     style = { styles.title1 }
                 />
                 <TextStandard 
-                    text = "Between 2 and 15."
+                    text = {
+`I'm Brett MacIsaac, a software engineering student based in Melbourne, Australia.`
+                    }
+                    style = { styles.paragraph }
+                />
+                <TextStandard 
+                    text = {
+`Email: brett.macisaac@outlook.com`
+                    }
                     style = { styles.paragraph }
                 />
             </Container>
 
-            <Container>
+            <Container style = { styles.conText }>
                 <TextStandard 
-                    text = "What is Kelly Pool?"
+                    text = "Why was Grid Stacker Created?"
                     size = { 2 }
                     isBold
                     style = { styles.title1 }
                 />
                 <TextStandard 
                     text = {
-`Kelly pool is a 'free-for-all' game played on a pool table between 2 or more players.`
+`After trying to find a simple, no-frills 'falling-blocks' game, I was disappointed by many of the current offerings. 
+I was frustrated with all of the additional modes, the absurd amount of ads, the clunky controls, the pay-to-win  
+structures, the lack of customisation, etc.`
                     }
                     style = { styles.paragraph }
                     removeLineBreaks
                 />
                 <TextStandard 
                     text = {
-`It's ideal for situations where more than two players want to play. With a standard game of pool, people can spend long 
-periods of time simply watching others play; with Kelly Pool, everyone gets to join in simultaneously.`
+`Thus, I decided to develop my own game. A game that lets you do exactly what you want: stack blocks on a grid and score
+ points until you lose.`
                     }
                     style = { styles.paragraph }
                     removeLineBreaks
                 />
             </Container>
 
-            <Container>
+            <Container style = { styles.conText }>
                 <TextStandard 
-                    text = "How to Play"
+                    text = "How is Grid Stacker Different?"
                     size = { 2 }
                     isBold
                     style = { styles.title1 }
                 />
                 <TextStandard 
                     text = {
-`The steps below describe how to play Kelly Pool.`
+`While Grid Stacker obviously shares similarities with its predecessors, the game places greater emphasis on 
+customisation and flexibility, resulting in several noteworthy features that set it apart.`
                     }
                     style = { styles.paragraph }
                     removeLineBreaks
                 />
 
                 <TextStandard 
-                    text = "Step 1"
-                    size = { 1 }
-                    isBold
+                    text = "Cross-Platform" isBold size = { 1 }
                     style = { styles.title2 }
                 />
                 <TextStandard 
                     text = {
-`Determine the number of balls each player will be assigned. Each player must have the same number of balls at 
-the start.`
+`Whether you're on a computer, tablet, or smartphone, Grid Stacker will look appealing and remain playable.
+The game should also work as intended on any modern browser.`
                     }
                     style = { styles.paragraph }
                     removeLineBreaks
                 />
                 <TextStandard 
                     text = {
-`The number of balls per player is selected in the menu, in addition to the number of players.`
+`If you're on a mobile device, the game's UI will adjust depending on whether your phone is in landscape or portrait view.`
+                    }
+                    style = { styles.paragraph }
+                    removeLineBreaks
+                />
+                <TextStandard 
+                    text = {
+`The on-screen controls are available no matter which device you are playing on; however, intuitive keyboard controls 
+give you access to all controls, allowing for a comfortable and effective experience when playing on a computer.`
                     }
                     style = { styles.paragraph }
                     removeLineBreaks
                 />
 
                 <TextStandard 
-                    text = "Step 2"
-                    size = { 1 }
-                    isBold
+                    text = "Changeable Grid Size" isBold size = { 1 }
                     style = { styles.title2 }
                 />
                 <TextStandard 
                     text = {
-`Assign each player the number of balls determined in step 1. Each player should be the only one who knows what balls 
-they've been assigned.`
-                    }
-                    style = { styles.paragraph }
-                    removeLineBreaks
-                />
-                <TextStandard 
-                    text = {
-`The app automatically assigns balls randomly to players. During the game, if you click on your name, this will 
-highlight both your name and your balls; click on your name again to hide your balls. Be sure not to 'accidentally' look 
-at other player's balls, or leave yours open for others' to see!`
+`You get to decide how big the grid is, with over 100 unique grid sizes. No longer are you forced
+to play on a 10x20 grid.`
                     }
                     style = { styles.paragraph }
                     removeLineBreaks
                 />
 
                 <TextStandard 
-                    text = "Step 3"
-                    size = { 1 }
-                    isBold
+                    text = "Changeable Blocks" isBold size = { 1 }
                     style = { styles.title2 }
                 />
                 <TextStandard 
                     text = {
-`Determine the order in which players take their turns.`
-                    }
-                    removeLineBreaks
-                    style = { styles.paragraph }
-                />
-                <TextStandard 
-                    text = {
-`The app automatically orders players randomly.`
+`In addition to changing the grid size, you can also choose which blocks can spawn in, which results 
+in over 16,000 unique game modes.`
                     }
                     style = { styles.paragraph }
                     removeLineBreaks
                 />
 
                 <TextStandard 
-                    text = "Step 4"
-                    size = { 1 }
-                    isBold
+                    text = "Block Spawn System" isBold size = { 1 }
                     style = { styles.title2 }
                 />
                 <TextStandard 
                     text = {
-`Set up the pool balls with the triangle as you would for an ordinary game of pool.`
+`With most games in this genre, the blocks spawn above the grid, out-of-sight from the user, and proceed to 'fall' onto 
+the grid. With Grid Stacker, the blocks spawn directly onto the grid; moreover, rather than spawning in static 
+locations, the blocks can spawn anywhere in the top-two mrows, which makes playing on smaller grid sizes significantly 
+more manageable.`
                     }
-                    removeLineBreaks
                     style = { styles.paragraph }
+                    removeLineBreaks
                 />
 
                 <TextStandard 
-                    text = "Step 5"
-                    size = { 1 }
-                    isBold
+                    text = "Block Rotation System" isBold size = { 1 }
                     style = { styles.title2 }
                 />
                 <TextStandard 
                     text = {
-`The first player begins by 'breaking', as with a standard pool game. Each player has their turn in the order displayed 
-on the screen. A player's turn ends when they have a shot that fails to pot a ball, just as with normal pool. When a 
-ball is potted, double-click the corresponding ball on the screen. Once a player loses all of their balls, they are out 
-of the game. The winner is the last remaining player.`
+`The rotation system used in Grid Stacker is a modified form of the standard SRS (Super Rotation System) used by many 
+games in the genre. The rotation system has been modified slightly to make playing on smaller grid sizes easier.`
                     }
-                    removeLineBreaks
                     style = { styles.paragraph }
-                />
-
-            </Container>
-
-            <Container>
-                <TextStandard 
-                    text = "Optional Rules"
-                    size = { 2 }
-                    isBold
-                    style = { styles.title1 }
-                />
-                <TextStandard 
-                    text = {
-`This is a list of optional rules that can be added to a game of Kelly Pool.`
-                    }
                     removeLineBreaks
-                    style = { styles.paragraph }
                 />
 
                 <TextStandard 
-                    text = "1. Hidden Ball Counts"
-                    size = { 1 }
-                    isBold
+                    text = "Themes" isBold size = { 1 }
                     style = { styles.title2 }
                 />
                 <TextStandard 
                     text = {
-`In a standard Kelly Pool game, when a player's ball is lost, they inform the other players. By default, the app 
-displays whose ball was lost and the number of balls each player has remaining. In the menu you can disable this 
-feature, which means that when a ball is potted it's not known whom it belongs to. This can heighten the game's 
-suspense.`
+`The colour of the UI can be changed to suit your preference. Each theme is designed to be easy on the eyes: no more 
+obscenely-colourful vomit spewed across your screen.`
                     }
                     style = { styles.paragraph }
                     removeLineBreaks
                 />
 
                 <TextStandard 
-                    text = "2. Penalties for Violations"
-                    size = { 1 }
-                    isBold
+                    text = "Installable" isBold size = { 1 }
                     style = { styles.title2 }
                 />
                 <TextStandard 
                     text = {
-`If a player's name is clicked (selected), you will notice that two buttons appear below the balls: 'Add Ball' and 
-'Remove Ball'. Unsurprisingly, these buttons respectively add and remove balls from the selected player.`
+`Grid Stacker is PWA (Progressive Web App), meaning that it can be installed to your device and played offline.`
                     }
                     style = { styles.paragraph }
-                    removeLineBreaks
-                />
-                <TextStandard 
-                    text = {
-`This allows you to create penalties such as the removal of one ball from a player should they fail to hit a ball, hit 
-a ball off the table, miss the white ball completely on their swing, etc. `
-                    }
-                    style = { styles.paragraph }
-                    removeLineBreaks
                 />
 
-                <TextStandard 
-                    text = "3. Rewards for Potting Balls"
-                    size = { 1 }
-                    isBold
-                    style = { styles.title2 }
-                />
-                <TextStandard 
-                    text = {
-`Again making use of the buttons described above, another rule could be to give one ball to a player (by using the 
-'Add Ball' button) if they pot another player's ball.`
-                    }
-                    style = { styles.paragraph }
-                    removeLineBreaks
-                />
-                <TextStandard 
-                    text = {
-`This rule makes the game more dependent on skill, as one would be able to gain a significant advantage by playing 
-better. `
-                    }
-                    style = { styles.paragraph }
-                    removeLineBreaks
-                />
-                <TextStandard 
-                    text = {
-`This rule also opens up an interesting strategy: if one of your balls is close to a pocket, rather than missing it on 
-purpose, or pretending to ignore it (both of which reveal the ball to be yours), you can simply pot it and gain a new 
-ball, the identity of which no other player will know.`
-                    }
-                    style = { styles.paragraph }
-                    removeLineBreaks
-                />
-                <TextStandard 
-                    text = {
-`It's worth noting that only unassigned balls can be added, meaning that if all the remaining balls belong to players, 
-players can no longer gain balls. `
-                    }
-                    style = { styles.paragraph }
-                    removeLineBreaks
-                />
             </Container>
 
         </PageContainer>
@@ -309,6 +243,11 @@ const styles =
         //alignItems: "center",
         paddingLeft: utilsGlobalStyles.spacingVertN(-2),
         paddingRight: utilsGlobalStyles.spacingVertN(-2),
+    },
+    conText:
+    {
+        width: "100%",
+        maxWidth: 500
     },
     paragraph:
     {

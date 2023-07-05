@@ -100,6 +100,15 @@ class GridChar
             '1', '0', '0', '0', '0', 
             '1', '1', '1', '1', '1', 
         ],
+        'B': [ 
+            '1', '1', '1', '1', '0', 
+            '1', '0', '0', '0', '1', 
+            '1', '0', '0', '0', '1',
+            '1', '1', '1', '1', '0', 
+            '1', '0', '0', '0', '1', 
+            '1', '0', '0', '0', '1', 
+            '1', '1', '1', '1', '0', 
+        ],
         'P': [
             '1', '1', '1', '1', '0', 
             '1', '0', '0', '0', '1', 
@@ -319,10 +328,11 @@ class GridChar
 
         this.#fColourRandom = Block.Colours[lBlockTypeRandom];
 
-        let lColour = pColour;
-        if (!lColour)
+        let lColor = pColour;
+
+        if (!lColor)
         {    
-            lColour = this.#fColourRandom;
+            lColor = this.#fColourRandom;
         }
 
         if (!Object.hasOwn(GridChar.sCharDefs5x7, pChar))
@@ -336,7 +346,7 @@ class GridChar
         {
             if (lCharDef[i] == '1')
             {
-                this.#fGrid.grid[i] = lColour;
+                this.#fGrid.grid[i] = lColor;
             }
         }
     }
@@ -355,7 +365,7 @@ class GridChar
     {
         for (let i = 0; i < this.#fGrid.grid.length; ++i)
         {
-            if (this.#fGrid.grid[i] != Grid.sColourEmptyTile)
+            if (this.#fGrid.grid[i]) // != undefined
             {
                 this.#fGrid.grid[i] = pColour;
             }

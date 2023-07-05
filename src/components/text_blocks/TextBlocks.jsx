@@ -17,13 +17,13 @@ function TextBlocks({ prText, prSizeText, prStyle, prIsHorizontal, prColourBackg
         prText.split(' ').map(
             (pWord) => 
             {
-                return pWord.split('').map((char) => { return new GridChar(char); })
+                return pWord.split('').map((char) => { return new GridChar(char, prColourText); })
             }
         )
     );
 
     return (
-        <div style = {{ ...styles.container, ...prStyle, columnGap: prSizeText * 0.5 }}>
+        <div style = {{ ...styles.container, ...prStyle, columnGap: prSizeText * 0.6 }}>
             {
                 stTextGridified.map(
                     (pWordGridified, pIndex) =>
@@ -55,7 +55,7 @@ function TextBlocks({ prText, prSizeText, prStyle, prIsHorizontal, prColourBackg
                                                     key = { pIndex2 } prGrid = { pCharGridified.grid } 
                                                     prMaxWidth = { prSizeText } prMaxHeight = { prSizeText } 
                                                     prColourBackground = { prColourBackground ? prColourBackground : theme.content } 
-                                                    prColourEmptyCell = { prColourEmptyCell ? prColourEmptyCell : theme.buttonContent }
+                                                    prColourEmptyCell = { prColourEmptyCell ? prColourEmptyCell : theme.emptyGridCell }
                                                     prColourBorder = { prColourBorder }
                                                 />
                                             );

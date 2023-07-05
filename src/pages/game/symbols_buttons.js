@@ -1,16 +1,16 @@
 import GridSymbol from '../../classes/GridSymbol';
 
 const gridSymbols = {
-    left: new GridSymbol('arrowLeftDouble'),
-    right: new GridSymbol('arrowRightDouble'),
-    leftMax: new GridSymbol('arrowLeftDoubleSplit'),
-    rightMax: new GridSymbol('arrowRightDoubleSplit'),
-    down: new GridSymbol('arrowDownDouble'),
-    downMax: new GridSymbol('arrowDownDoubleSplit'),
+    left: new GridSymbol('left'),
+    right: new GridSymbol('right'),
+    leftMax: new GridSymbol('leftMax'),
+    rightMax: new GridSymbol('rightMax'),
+    down: new GridSymbol('down'),
+    downMax: new GridSymbol('downMax'),
     clockwise: new GridSymbol('clockwise'),
-    anticlockwise: new GridSymbol('antiClockwise'),
-    rotate180: new GridSymbol('reflectionX'),
-    hold: new GridSymbol('blockHold')
+    anticlockwise: new GridSymbol('anticlockwise'),
+    rotate180: new GridSymbol('rotate180'),
+    hold: new GridSymbol('hold')
 }
 
 export default gridSymbols

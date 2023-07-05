@@ -32,7 +32,8 @@ import utils from '../../utils/utils';
             }
         }
 */
-function TableStandard({ prRowHeader, prRowsContent, prData, prSizeText, prBorders, prStyleTable, prStyleColumn, prStyleCellHeader, prStyleCellContent })
+function TableStandard({ prRowHeader, prRowsContent, prData, prSizeText, prBorders, prBorderColour, prBorderSize, prStyleTable, 
+                         prStyleColumn, prStyleCellHeader, prStyleCellContent })
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -52,9 +53,19 @@ function TableStandard({ prRowHeader, prRowsContent, prData, prSizeText, prBorde
         lRowHeader = prRowHeader;
     }
 
-    // Get the table's dimension.
-    const lNumColumns = prRowHeader.length;
-    const lNumRows = prRowsContent.length;
+    // The dimensions of the table.
+    let lNumColumns;
+    let lNumRows;
+    if (prData)
+    {
+        lNumColumns = prData.orderColumns.length;
+        lNumRows = Object.keys(prData.content.rows).length;
+    }
+    else
+    {
+        lNumColumns = prRowHeader.length;
+        lNumRows = prRowsContent.length;
+    }
 
     // The content rows.
     let lRows;
@@ -80,11 +91,9 @@ function TableStandard({ prRowHeader, prRowsContent, prData, prSizeText, prBorde
         {
             lRows[i] = utils.PadEndArray(prRowsContent[i], lNumColumns, "-");
         }
-
-        console.log(lRows);
     }
 
-    const lBorder = `2px solid ${theme.content}`;
+    const lBorder = `${prBorderSize}px solid ${prBorderColour ? prBorderColour : theme.content}`;
 
     return (
         <div
@@ -96,7 +105,7 @@ function TableStandard({ prRowHeader, prRowsContent, prData, prSizeText, prBorde
             }}
         >
             {
-                prRowHeader.map(
+                lRowHeader.map(
                     (pHeading, pIndexCol) =>
                     {
                         const lBorderRight = ((pIndexCol != lNumColumns - 1) || prBorders[1]) ? lBorder : undefined;
@@ -104,10 +113,11 @@ function TableStandard({ prRowHeader, prRowsContent, prData, prSizeText, prBorde
 
                         return (
                             <div 
-                            style = {{ 
-                                ...styles.column, ...prStyleColumn, 
-                                //borderRight: (pIndexCol == lNumColumns - 1) ? lBorder : undefined 
-                            }}
+                                key = { pIndexCol }
+                                style = {{ 
+                                    ...styles.column, ...prStyleColumn, 
+                                    //borderRight: (pIndexCol == lNumColumns - 1) ? lBorder : undefined 
+                                }}
                             >
                                 <TextStandard 
                                     text = { pHeading } isBold size = { prSizeText }
@@ -121,14 +131,19 @@ function TableStandard({ prRowHeader, prRowsContent, prData, prSizeText, prBorde
                                     Array(lNumRows).fill(undefined).map(
                                         (pIDC, pIndexRow) =>
                                         {
+                                            let lText = lRows[pIndexRow][pIndexCol];
+
+                                            if (!lText || lText.length == 0)
+                                                lText = "-";
+
                                             return (
                                                 <TextStandard 
                                                     key = { pIndexRow }
-                                                    text = { lRows[pIndexRow][pIndexCol] } size = { prSizeText }
+                                                    text = { lText } size = { prSizeText }
                                                     style = {{ 
                                                         ...styles.cell, ...styles.cellContent, ...prStyleCellContent,
                                                         borderTop: lBorder, borderRight: lBorderRight,
-                                                        borderLeft: lBorderLeft, borderBottom: ((pIndexRow == lNumRows - 1) && prBorders[2])  ? lBorder : undefined
+                                                        borderLeft: lBorderLeft, borderBottom: ((pIndexRow == lNumRows - 1) && prBorders[2]) ? lBorder : undefined
                                                     }} 
                                                 />
                                             );
@@ -167,13 +182,14 @@ TableStandard.propTypes =
     }),
     prSizeText: PropTypes.number,
     prBorders: PropTypes.arrayOf(PropTypes.bool),
-    prStyle: PropTypes.object,
+    prBorderSize: PropTypes.number
 };
 
 TableStandard.defaultProps =
 {
     prSizeText: 0,
-    prBorders: [ true, true, true, true ]
+    prBorders: [ true, true, true, true ],
+    prBorderSize: 2
 }
 
 const styles =
@@ -214,20 +230,18 @@ const styles =
 * Parameters:
     >
 */
-function defaultTableHeight(pNumRows, pSizeText, pBorders)
+function defaultTableHeight(pNumRows, pSizeText, pBorders, pBorderSize = 2)
 {
     let lPadding = styles.cell.padding;
     let lHeightPadding = pNumRows * 2 * lPadding;
 
-    let lHeightBorders = 2 * (pNumRows - 1);
+    let lHeightBorders = pBorderSize * (pNumRows - 1);
     if (pBorders[0])
-        lHeightBorders += 2;
+        lHeightBorders += pBorderSize;
     if (pBorders[2])
-        lHeightBorders += 2;
+        lHeightBorders += pBorderSize;
 
     let lHeightText = pNumRows * utilsGlobalStyles.fontSizeN(pSizeText);
-
-    console.log("Height of text: " + utilsGlobalStyles.fontSizeN(pSizeText))
 
     return lHeightPadding + lHeightBorders + lHeightText;
 }

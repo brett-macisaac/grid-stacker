@@ -21,34 +21,19 @@ import ThemeContext from "../../contexts/ThemeContext.js";
 import PreferenceContext from '../../contexts/PreferenceContext.js';
 import TextStandard from '../../components/text_standard/TextStandard';
 import TextInputStandard from '../../components/text_input_standard/TextInputStandard.jsx'
-import TableStandard, { defaultTableHeight } from '../../components/TableStandard/TableStandard';
+import TableStandard, { defaultTableHeight } from '../../components/table_standard/TableStandard';
 import { PopUpOk } from '../../components/pop_up_standard/PopUpStandard.jsx'
 
-/*
-* A local storage key for the high-scores.
-*/
-const gLclStrgKeyHighScores = "HighScores";
-
-const gMockScoreData = {
-    header: [ "STAT", "SCORE", "LINES", "USER" ],
-    content: [
-        [ "HI (G)",  "32,400",  50, "O'Shaghenesy" ],
-        [ "HI (L)",  "15,600",  44, "BrettMac21" ],
-        [ "NOW", "5,250",   20, "BrettMac21"  ]
-    ]
-};
-
-// console.log("Height of stats table: " + defaultTableHeight(4, -1, [ false, true, true, true ]));
-
-function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGameInProgress, prActiveBlocks, prStats, prHandlers }) 
+function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGameInProgress, prActiveBlocks, prStats, 
+                        prHandlers, prButtonSymbols, pUpdater }) 
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
     let theme = globalProps.themes[themeName];
 
-    const [ optionsPopUpMsg, setOptionsPopUpMsg ] = useState(undefined);
-
     const navigate = useNavigate();
+
+    const [ optionsPopUpMsg, setOptionsPopUpMsg ] = useState(undefined);
 
     useEffect(
         () =>
@@ -56,10 +41,6 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGameInProgress, 
         },
         []
     );
-
-    const handlePlay = () =>
-    {
-    };
 
     // The width of the container.
     const gWidthContainer = window.innerWidth >= styles.container.maxWidth ? styles.container.maxWidth : window.innerWidth;
@@ -89,6 +70,16 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGameInProgress, 
     const gMaxHeightGameButton = Math.floor((lHeightConBottom - 2 * styles.conGameControls.padding - styles.conGameControls.rowGap) / 2);
     const gMaxSizeGameButton = Math.min(gMaxWidthGameButton, gMaxHeightGameButton);
     const gMaxSizeGameButtonSymbol = gMaxSizeGameButton - 2 * styles.btnGameControl.padding;
+
+    // The 'top' game buttons.
+    const lGameButtonSymbolsTop = [
+        prButtonSymbols.left, prButtonSymbols.leftMax, prButtonSymbols.hold, prButtonSymbols.rightMax, prButtonSymbols.right
+    ];
+
+    // The 'bottom' game buttons
+    const lGameButtonSymbolsBottom = [
+        prButtonSymbols.anticlockwise, prButtonSymbols.down, prButtonSymbols.rotate180, prButtonSymbols.downMax, prButtonSymbols.clockwise
+    ];
 
     return ( 
         <PageContainer
@@ -135,43 +126,60 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGameInProgress, 
 
                 <div style = { styles.conTopMid }>
                     <TableStandard 
-                        prRowHeader = { gMockScoreData.header } 
-                        prRowsContent = { gMockScoreData.content }
+                        prData = { prStats }
                         prSizeText = { -1 } 
                         prBorders = { [ false, true, true, false ] }
                     />
+
                     <div style = { styles.conGrid }>
-                        <GridDisplayer 
-                            prGrid = { prGrid } 
-                            prMaxWidth = { gMaxWidthGameGrid } 
-                            prMaxHeight = { gMaxHeightGameGrid } 
-                        />
+                        {
+                            prGrid.instance && (
+                                <GridDisplayer 
+                                    prGrid = { prGrid.instance } 
+                                    prMaxWidth = { gMaxWidthGameGrid } 
+                                    prMaxHeight = { gMaxHeightGameGrid } 
+                                />
+                            )
+                        }
                     </div>
                 </div>
 
                 <div style = {{ ...styles.infoPanel, ...styles.infoPanelRight, borderColor: theme.content }}>
-                    <TextStandard text = "NEXT" isBold style = {{ textAlign: "center" }} />
-                    {
-                        prNextBlocks.map(
-                            (pNextBlock, pIndex) =>
-                            {
-                                const lGrid = new Grid(4, 4);
+                    <div style = { styles.conHoldBlock }>
+                        <TextStandard text = "HOLD" isBold style = {{ textAlign: "center" }} />
+                        <GridDisplayer 
+                            prGrid = { prGridHold } 
+                            prMaxHeight = { gMaxHeightTallyGrid } 
+                            prMaxWidth = { gMaxWidthTallyGrid } 
+                        />
+                    </div>
 
-                                lGrid.DrawBlockAt(pNextBlock, Grid.DrawPosition.CentreMid);
+                    <div style = { styles.conNextBlocks }>
+                        <TextStandard text = "NEXT" isBold style = {{ textAlign: "center" }} />
+                        {
+                            prNextBlocks.map(
+                                (pNextBlock, pIndex) =>
+                                {
+                                    const lGrid = new Grid(4, 4);
 
-                                return (
-                                    <GridDisplayer 
-                                        key = { pIndex }
-                                        prGrid = { lGrid } 
-                                        prMaxHeight = { gMaxHeightTallyGrid } 
-                                        prMaxWidth = { gMaxWidthTallyGrid } 
-                                        prColourBorder = { pIndex == prNextBlocks.length - 1 ? theme.selected : undefined }
-                                        //prOnClick = { () => { toggleBlock(pBlockType); } }
-                                    />
-                                );
-                            }
-                        )
-                    }
+                                    lGrid.DrawBlockAt(pNextBlock, Grid.DrawPosition.CentreMid);
+
+                                    const lOnClick = (pIndex == prNextBlocks.length - 1) ? prHandlers.rotateNextBlock : undefined;
+
+                                    return (
+                                        <GridDisplayer 
+                                            key = { pIndex }
+                                            prGrid = { lGrid } 
+                                            prMaxHeight = { gMaxHeightTallyGrid } 
+                                            prMaxWidth = { gMaxWidthTallyGrid } 
+                                            prColourBorder = { pIndex == prNextBlocks.length - 1 ? theme.selected : undefined }
+                                            prOnClick = { lOnClick }
+                                        />
+                                    );
+                                }
+                            )
+                        }
+                    </div>
                 </div>
 
             </div>
@@ -179,86 +187,88 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGameInProgress, 
             <div style = {{ ...styles.conBottom, borderColor: theme.content }}>
                     {
                         !prGameInProgress && (
-                            <div style = { styles.conMenuControls }>
+                            <div style = {{ ...styles.conMenuControls, backgroundColor: theme.header + "AA" }}>
                                 <ButtonBlocks 
                                     text = "PLAY" 
                                     onPress = { prHandlers.play } 
-                                    prColourEmptyCell = { theme.content }
-                                    style = {{ ...styles.btnMenuControl, backgroundColor: theme.content }} 
+                                    prColourBackground = { "transparent" }
+                                    prColourEmptyCell = { "transparent" }
+                                    style = {{ ...styles.btnMenuControl, backgroundColor: theme.content + "CB" }} 
                                 />
                                 <ButtonBlocks 
                                     text = "EXIT" 
-                                    onPress = { () => navigate("/") } 
-                                    prColourEmptyCell = { theme.content }
-                                    style = {{ ...styles.btnMenuControl, backgroundColor: theme.content }} 
+                                    onPress = { () => prHandlers.exit(navigate) } 
+                                    prColourBackground = { "transparent" }
+                                    prColourEmptyCell = { "transparent" }
+                                    style = {{ ...styles.btnMenuControl, backgroundColor: theme.content + "CB" }} 
                                 />
                             </div>
                         )
                     }
-                    {
-                        prGameInProgress && (
-                            <div style = { styles.conGameControls }>
-                                <div style = { styles.conGameControlsSub }>
+                    <div style = { styles.conGameControls }>
+                        <div style = { styles.conGameControlsSub }>
+                            {
+                                lGameButtonSymbolsTop.map(
+                                    (pSymbol, pIndex) =>
                                     {
-                                        gGameButtonSymbolsTop.map(
-                                            (pSymbol, pIndex) =>
-                                            {
-                                                const lAlignSelf = pIndex % 2 == 1 ? "flex-end" : "flex-start";
+                                        const lAlignSelf = pIndex % 2 == 1 ? "flex-end" : "flex-start";
 
-                                                return (
-                                                    <ButtonStandard 
-                                                        key = { pIndex }
-                                                        style = {{ 
-                                                            ...styles.btnGameControl, 
-                                                            border: `1px solid ${pSymbol.randomColour}`,
-                                                            alignSelf: lAlignSelf
-                                                        }}
-                                                        onPress = { () => { console.log("Pressed game button."); } }
-                                                    >
-                                                        <GridDisplayer 
-                                                            prGrid = { pSymbol.grid } 
-                                                            prMaxHeight = { gMaxSizeGameButtonSymbol }
-                                                            prMaxWidth = { gMaxSizeGameButtonSymbol }
-                                                            prColourBackground = { theme.buttonContent }
-                                                        />
-                                                    </ButtonStandard>
-                                                )
-                                            }
+                                        const lOnPress = prHandlers[pSymbol.name] ? prHandlers[pSymbol.name] : () => { console.log("No handler assigned."); };
+
+                                        return (
+                                            <ButtonStandard 
+                                                key = { pIndex }
+                                                style = {{ 
+                                                    ...styles.btnGameControl, 
+                                                    border: `1px solid ${pSymbol.colour}`,
+                                                    alignSelf: lAlignSelf
+                                                }}
+                                                onPress = { lOnPress }
+                                            >
+                                                <GridDisplayer 
+                                                    prGrid = { pSymbol.grid } 
+                                                    prMaxHeight = { gMaxSizeGameButtonSymbol }
+                                                    prMaxWidth = { gMaxSizeGameButtonSymbol }
+                                                    prColourBackground = { theme.buttonContent }
+                                                />
+                                            </ButtonStandard>
                                         )
                                     }
-                                </div>
-                                <div style = { styles.conGameControlsSub }>
-                                {
-                                        gGameButtonSymbolsBottom.map(
-                                            (pSymbol, pIndex) =>
-                                            {
-                                                const lAlignSelf = pIndex % 2 == 1 ? "flex-end" : "flex-start";
+                                )
+                            }
+                        </div>
+                        <div style = { styles.conGameControlsSub }>
+                        {
+                                lGameButtonSymbolsBottom.map(
+                                    (pSymbol, pIndex) =>
+                                    {
+                                        const lAlignSelf = pIndex % 2 == 1 ? "flex-end" : "flex-start";
 
-                                                return (
-                                                    <ButtonStandard 
-                                                        key = { pIndex }
-                                                        style = {{ 
-                                                            ...styles.btnGameControl, 
-                                                            border: `1px solid ${pSymbol.randomColour}`,
-                                                            alignSelf: lAlignSelf
-                                                        }}
-                                                        onPress = { () => { console.log("Pressed game button."); } }
-                                                    >
-                                                        <GridDisplayer 
-                                                            prGrid = { pSymbol.grid } 
-                                                            prMaxHeight = { gMaxSizeGameButtonSymbol }
-                                                            prMaxWidth = { gMaxSizeGameButtonSymbol }
-                                                            prColourBackground = { theme.buttonContent }
-                                                        />
-                                                    </ButtonStandard>
-                                                )
-                                            }
+                                        const lOnPress = prHandlers[pSymbol.name] ? prHandlers[pSymbol.name] : () => { console.log("No handler assigned."); };
+
+                                        return (
+                                            <ButtonStandard 
+                                                key = { pIndex }
+                                                style = {{ 
+                                                    ...styles.btnGameControl, 
+                                                    border: `1px solid ${pSymbol.colour}`,
+                                                    alignSelf: lAlignSelf
+                                                }}
+                                                onPress = { lOnPress }
+                                            >
+                                                <GridDisplayer 
+                                                    prGrid = { pSymbol.grid } 
+                                                    prMaxHeight = { gMaxSizeGameButtonSymbol }
+                                                    prMaxWidth = { gMaxSizeGameButtonSymbol }
+                                                    prColourBackground = { theme.buttonContent }
+                                                />
+                                            </ButtonStandard>
                                         )
                                     }
-                                </div>
-                            </div>
-                        )
-                    }
+                                )
+                            }
+                        </div>
+                    </div>
             </div>
 
         </PageContainer>
@@ -267,7 +277,7 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGameInProgress, 
 
 GamePortrait.propTypes = 
 {
-    prGrid: PropTypes.instanceOf(Grid).isRequired,
+    prGrid: PropTypes.shape({ instance: PropTypes.instanceOf(Grid) }).isRequired,
     prBlockTallies: PropTypes.shape({
         I: PropTypes.number,
         J: PropTypes.number,
@@ -308,6 +318,7 @@ const styles =
         //height: 0.25 * window.innerHeight,
         borderTop: "2px solid",
         justifyContent: "center",
+        position: "relative"
         //backgroundColor: "#000853"
     },
     infoPanel:
@@ -316,7 +327,7 @@ const styles =
         //backgroundColor: "#005304",
         padding: utilsGlobalStyles.spacingVertN(-3),
         rowGap: utilsGlobalStyles.spacingVertN(-2),
-        justifyContent: "flex-start",
+        justifyContent: "space-between",
         alignItems: "center",
     },
     conTopMid:
@@ -339,13 +350,24 @@ const styles =
     {
         borderLeft: "2px solid",
     },
+    conNextBlocks:
+    {
+        rowGap: utilsGlobalStyles.spacingVertN(-2),
+    },
+    conHoldBlock:
+    {
+        rowGap: utilsGlobalStyles.spacingVertN(-2),
+    },
     conMenuControls:
     {
+        width: "100%",
         height: "100%",
         justifyContent: "space-between",
         alignItems: "center",
         rowGap: utilsGlobalStyles.spacingVertN(-2),
         padding: utilsGlobalStyles.spacingVertN(-1),
+        zIndex: 1,
+        position: "absolute",
     },
     btnMenuControl:
     {
@@ -353,7 +375,7 @@ const styles =
         maxWidth: 400,
         borderRadius: globalProps.borderRadiusStandard,
         padding: 8,
-        alignItems: "center"
+        alignItems: "center",
     },
     conGameControls:
     {
@@ -375,7 +397,7 @@ const styles =
         padding: 7,
         borderRadius: globalProps.borderRadiusStandard,
         //border: "1px solid"
-    }
+    },
 };
 
 // The height of the 'stats table'.

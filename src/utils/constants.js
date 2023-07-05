@@ -1,8 +1,11 @@
 
 const consts = 
 {
-    numPoolBalls: 15, // The number of pool balls.
-    lclStrgKeyPrevNames: "PreviousPlayers"
+    lclStrgKeyPrevNames: "PreviousPlayers",
+    lclStrgKeyHighScores: "HighScoresLocal",
+    lclStrgKeyTimesPlayed: "TimesPlayedLocal",
+    lclStrgKeyTotalTimesPlayed: "TotalTimesPlayedLocal",
+    lclStrgKeyPreferences: "GamePrefs"
 }
 
 export default consts;

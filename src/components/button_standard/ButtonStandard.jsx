@@ -22,12 +22,14 @@ import globalProps, { utilsGlobalStyles } from '../../styles';
     > onSinglePress: when the doubleClick prop is set to true, this function is called if the user doesn't execute a 
                      'double-click': i.e. when they press once but don't press again within the allocated time.
     > doubleClick: whether a 'double click' is required to activate the button's onPress.
+    > isOnDown: whether the onPress function should be called immediately when the user presses it, or if it should only
+      be called once the user has released their finger/mouse.
     > style: the style of the component's container.
     > styleText: the style of the text within the container. The TextStandard component is used here, so refer to that
                  component's code for information regarding how styling is applied.
 */
-function ButtonStandard({ children, icon, text, sizeText, isBold, activeOpacity, onPress, onSinglePress, doubleClick, 
-                          style, styleText })
+function ButtonStandard({ children, icon, text, sizeText, isBold, onPress, onSinglePress, doubleClick, 
+                          isOnDown, style, styleText })
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -79,9 +81,21 @@ function ButtonStandard({ children, icon, text, sizeText, isBold, activeOpacity,
         setIndexPressPrevious(indexPress);
     }
 
+    let lPressFunctions = { };
+    if (isOnDown)
+    {
+        lPressFunctions.onMouseDown = handlePress;
+        lPressFunctions.onTouchStart = (e) => { e.preventDefault(); handlePress() };
+    }
+    else
+    {
+        lPressFunctions.onClick = handlePress;
+    }
+
     return (
         <div
-            onClick = { handlePress }
+            { ...lPressFunctions }
+            //onClick = { handlePress }
             style = {{ 
                 backgroundColor: theme.buttonContent,
                 borderColor: theme.borders,
@@ -123,6 +137,7 @@ ButtonStandard.propTypes =
     onPress: PropTypes.func,
     onSinglePress: PropTypes.func,
     doubleClick: PropTypes.bool,
+    isOnDown: PropTypes.bool,
     style: PropTypes.object,
     styleText: PropTypes.object,
 };
@@ -134,6 +149,7 @@ ButtonStandard.defaultProps =
     isBold: false,
     activeOpacity: 0.7,
     doubleClick: false,
+    isOnDown: false,
     style: {},
     styleText: {}
 }

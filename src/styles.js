@@ -17,8 +17,6 @@ const globalProps =
 
     widthCon: gWidthCon,
 
-    widthGridPoolBall: gWidthCon * 0.9,
-
     borderRadiusStandard: 10,
 
     colourSelected: "#B89F11",
@@ -59,6 +57,8 @@ const globalProps =
             fontButtonContent: "#ffffff",
             fontButtonNavBar: "#ffffff",
             selected: "#7c6a04",
+            gridBackground: "#2F2F69",
+            emptyGridCell: "#060627",
             name: "Ocean"
         },
         darkRed:
@@ -75,6 +75,8 @@ const globalProps =
             fontButtonContent: "#ffffff",
             fontButtonNavBar: "#ffffff",
             selected: "#7c6a04",
+            gridBackground: "#692F2F",
+            emptyGridCell: "#270606",
             name: "Scarlet"
         },
         darkPurple:
@@ -91,6 +93,8 @@ const globalProps =
             fontButtonContent: "#ffffff",
             fontButtonNavBar: "#ffffff",
             selected: "#7c6a04",
+            gridBackground: "#4F2F69",
+            emptyGridCell: "#170627",
             name: "Plum"
         },
     },

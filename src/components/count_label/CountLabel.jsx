@@ -1,28 +1,32 @@
 import React, { useContext } from "react";
+import PropTypes from 'prop-types';
 
 import ThemeContext from "../../contexts/ThemeContext.js";
 import globalProps, { utilsGlobalStyles } from "../../styles.js";
 import TextStandard from '../text_standard/TextStandard.jsx';
 
-function CountLabel({ text, count, size })
+function CountLabel({ text, count, size, style })
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
     let theme = globalProps.themes[themeName];
 
+    const lSizeFont = utilsGlobalStyles.fontSizeN(size);
+
     return (
         <div style = {{ 
-                ...styles.conOuter,  backgroundColor: theme.header, borderColor: theme.borders
+                ...styles.conOuter, ...style, columnGap: lSizeFont, backgroundColor: theme.header, borderColor: theme.borders
             }}
         >
 
-            <div style = {{ marginLeft: utilsGlobalStyles.fontSizeN(size) }}>
+            <div style = {{ marginLeft: lSizeFont }}>
                 <TextStandard text = { text } size = { size } isBold />
             </div>
 
             <div style = {{ 
-                    ...styles.conCount, width: 3 * utilsGlobalStyles.fontSizeN(size), backgroundColor: theme.header, 
-                    borderLeftColor: theme.borders
+                    ...styles.conCount, backgroundColor: theme.header, 
+                    borderLeftColor: theme.borders, paddingRight: lSizeFont / 2, paddingLeft: lSizeFont / 2, 
+                    minWidth: 3 * lSizeFont
                 }}
             >
                 <TextStandard text = { count } size = { size } isBold />
@@ -30,6 +34,19 @@ function CountLabel({ text, count, size })
 
         </div>
     );
+}
+
+CountLabel.propTypes =
+{
+    text: PropTypes.string.isRequired,
+    count: PropTypes.number.isRequired,
+    size: PropTypes.number,
+    style: PropTypes.object
+};
+
+CountLabel.defaultProps =
+{
+    size: 0
 }
 
 const styles =
@@ -41,7 +58,6 @@ const styles =
         justifyContent: "space-between",
         width: "100%",
         borderBottom: "1px solid",
-        marginBottom: Math.floor(utilsGlobalStyles.spacingVertN(-1)),
     },
 
     conCount:
@@ -50,7 +66,8 @@ const styles =
         justifyContent: "center",
         paddingTop: 0.6 * utilsGlobalStyles.fontSizeN(1),
         paddingBottom: 0.6 * utilsGlobalStyles.fontSizeN(1),
-        borderLeft: "1px solid"
+        borderLeft: "1px solid",
+        flexShrink: 0
     },
 
 };

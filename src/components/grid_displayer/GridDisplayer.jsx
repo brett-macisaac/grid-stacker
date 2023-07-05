@@ -12,14 +12,6 @@ function GridDisplayer({ prGrid, prMaxWidth, prMaxHeight, prOnClick, prColourEmp
     const { themeName } = useContext(ThemeContext);
     let theme = globalProps.themes[themeName];
 
-    // useEffect(
-    //     () =>
-    //     {
-    //         Grid.sColourEmptyTile = "#555555";
-    //     },
-    //     []
-    // )
-
     const lDimensionGrid = prGrid.dimension;
 
     // The total amount of space required for the squares' margins in the horizontal direction.
@@ -61,7 +53,7 @@ function GridDisplayer({ prGrid, prMaxWidth, prMaxHeight, prOnClick, prColourEmp
                     {
                         let lColour = pColour;
 
-                        if (lColour == Grid.sColourEmptyTile)
+                        if (!lColour) // If the tile is empty.
                         {
                             lColour = prColourEmptyCell ? prColourEmptyCell : theme.emptyGridCell;
                         }

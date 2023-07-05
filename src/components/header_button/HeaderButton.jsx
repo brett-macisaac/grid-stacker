@@ -24,6 +24,7 @@ function HeaderButton({ icon, onPress })
         <ButtonStandard 
             icon = { icon(globalProps.sizeIconHeaderFooter, theme.iconHeader) }
             onPress = { onPress }
+            isOnDown
             style = { styles.button }
         />
     )

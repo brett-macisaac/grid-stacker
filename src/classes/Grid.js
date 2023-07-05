@@ -59,7 +59,7 @@ class Grid
     /*
     * The colour of an empty tile.
     */
-    static sColourEmptyTile = "#000000";
+    //static sColourEmptyTile = "#000000";
 
     // The default number of columns (i.e. the number of tiles in each row).
     static S_NUM_COLUMNS_DEFAULT = 10;
@@ -89,7 +89,7 @@ class Grid
     constructor(aNumColumns, aNumRows, aText = "")
     {
         // Store references of all the tiles.
-        this.#fGrid = Array(aNumColumns * aNumRows).fill(Grid.sColourEmptyTile);
+        this.#fGrid = Array(aNumColumns * aNumRows).fill(undefined);
 
         this.#fNumRows = aNumRows;
         this.#fNumColumns = aNumColumns;
@@ -131,7 +131,7 @@ class Grid
 
     get grid()
     {
-        return this.#fGrid
+        return this.#fGrid;
     }
 
     GetIndex(aCol, aRow)
@@ -146,13 +146,17 @@ class Grid
 
     SetTileColour(aCol, aRow, aColour)
     {
-        // Will this work?
         this.#fGrid[this.GetIndex(aCol, aRow)] = aColour;
+    }
+
+    EmptyTile(aCol, aRow)
+    {
+        this.SetTileColour(aCol, aRow, undefined);
     }
 
     IsTileEmpty(aCol, aRow)
     {
-        return this.GetTile(aCol, aRow) === Grid.sColourEmptyTile;
+        return this.GetTile(aCol, aRow) == undefined;
     }
 
     /*
@@ -167,11 +171,11 @@ class Grid
     }
 
     /*
-     * Sets all of the tiles to the colour Grid.sColourEmptyTile (i.e. 'empties' the grids' tiles).
+    * Sets all of the tiles to undefined (i.e. empty the grids' tiles).
     */
     Reset()
     {
-        this.#fGrid.fill(Grid.sColourEmptyTile);
+        this.#fGrid.fill(undefined);
     }
     
     /*
@@ -190,95 +194,7 @@ class Grid
         
         return true;
     }
-    
-    /*
-    * Clears all rows that are full and also shifts all other (non-full) rows downwards.
-     
-     * Return Value:
-         > The number of full rows that were cleared. 
-    */
-    async RemoveFullLines() //throws InterruptedException
-    {   
-        // The time to pause between individual tiles being shifted down (ms).
-        const lLengthPause = 20;
 
-        // The number of full rows found thus far.
-        let lNumFullRows = 0;
-        
-        for (let row = this.#fNumRows - 1; row >= 0; --row)
-        {   
-            let lIsRowFull = true;
-            let lIsRowEmpty = true;
-            
-            for (let col = 0; col < this.#fNumColumns; ++col)
-            {
-                if (!lIsRowFull && !lIsRowEmpty) // If both booleans have been falsified.
-                {
-                    break;
-                }
-                else if (this.IsTileEmpty(col, row))
-                {
-                    // If at least one tile is empty, the row can't be full.
-                    lIsRowFull = false;
-                }
-                else // if (!this.IsTileEmpty(col, row))
-                {
-                    // If at least one tile is filled, the row can't be empty.
-                    lIsRowEmpty = false;
-                }
-                
-            }
-            
-            if (lIsRowFull) 
-            { 
-                // Record occurrence of full row.
-                ++lNumFullRows;
-                
-                // Clear the row.
-                for (let col = 0; col < this.#fNumColumns; ++col)
-                {
-                    if (this.IsTileEmpty(col, row))
-                    { continue; }
-                    
-                    this.SetTileColour(col, row, Grid.sColourEmptyTile);
-
-                    await utils.SleepFor(lLengthPause);
-                }
-                
-            }
-            else if (lIsRowEmpty) // If the row is empty, this means that all rows above it are also empty.
-            {
-                break;
-            }
-            else if (lNumFullRows !== 0) // && !lIsRowFull && !lIsRowEmpty (if the row isn't full and isn't empty: i.e. semi-filled).
-            {
-                // Shift the (non-full, non-empty) row down lNumFullRows rows.
-                for (let col = 0; col < this.#fNumColumns; ++col)
-                {
-                    // n.b. it's '+ lNumFullRows' not '- lNumFullRows' because under the current coordinate system
-                    // the row index (y-coordinate) increases down the screen.
-                    
-                    if (this.IsTileEmpty(col, row))
-                    { continue; }
-                    
-                    // Copy the colour of the tile at coordinate (col,row) to the appropriate row (row + lNumFullRows).
-                    //fGrid[col][row + lNumFullRows].SetColour(fGrid[col][row].GetColour());
-                    this.SetTileColour(col, row + lNumFullRows, this.GetTile(col, row))
-                    
-                    // Clear the colour of the tile at coordinate (col,row).
-                    this.SetTileColour(col, row, Grid.sColourEmptyTile);
-                    
-                    await utils.SleepFor(lLengthPause);
-                }
-                
-            }
-            
-        }
-        
-        // Return the number of full rows that were cleared.
-        return lNumFullRows;
-    }
-    
     /*
      * This method returns true if the given position/coordinate is both valid (within valid bounds) and empty; false if
        otherwise.
@@ -378,7 +294,7 @@ class Grid
                 break;
             }
         }
-        
+
         // Return if the tetromino's position is invalid.
         if (!lIsPositionValid) 
             return false;
@@ -387,19 +303,19 @@ class Grid
         const lColourBlock = aBlock.GetColour();
 
         // Draw the shadow.
-        if (aDrawShadow)
-        {
-            // The shadow tetromino
-            this.#fBlockShadow = aBlock.copy();
+        // if (aDrawShadow)
+        // {
+        //     // The shadow tetromino
+        //     this.#fBlockShadow = aBlock.copy();
 
-            this.#fBlockShadow.colour = Block.sColourShadow;
+        //     this.#fBlockShadow.colour = Block.sColourShadow;
 
-            let lLengthDrop = this.#fBlockShadow.Drop(this, false);
+        //     let lLengthDrop = this.#fBlockShadow.Drop(this, false);
 
-            // Draw the shadow if the distance from it to aBlock is greater than 3 rows.
-            if (lLengthDrop < 4)
-                this.UnDrawBlock(this.#fBlockShadow, false);
-        }
+        //     // Draw the shadow if the distance from it to aBlock is greater than 3 rows.
+        //     if (lLengthDrop < 4)
+        //         this.UnDrawBlock(this.#fBlockShadow, false);
+        // }
 
         // Draw the tetromino.
         for (const v of aBlock.position) 
@@ -431,16 +347,19 @@ class Grid
         
         // Return if the tetromino's position is invalid.
         if (!lIsPositionValid)
-        { return; }
+        { 
+            console.log("Invalid position!");
+            return; 
+        }
 
         // Remove the 'shadow' tetromino.
-        if (aUndrawShadow)
-            this.UnDrawBlock(this.#fBlockShadow, false);
+        // if (aUndrawShadow && this.#fBlockShadow)
+        //     this.UnDrawBlock(this.#fBlockShadow, false);
         
         // Remove the tetromino.
         for (const v of aBlock.position) 
         {
-            this.SetTileColour(v.x, v.y, Grid.sColourEmptyTile);
+            this.EmptyTile(v.x, v.y);
         }
         
     }

@@ -162,7 +162,14 @@ class Block
     
     
 // Methods (9) =========================================================================================================
-    
+
+    Rotate180(aGrid)
+    {
+        this.Rotate(true, aGrid, true, true);
+
+        return this.Rotate(true, aGrid, true, false);
+    }
+
     /* Rotation Method
      * This method rotates the block in the given direction.
      * The rotation system is based on the Super Rotation System (SRS). For more information on how this system works, 
@@ -170,15 +177,14 @@ class Block
     
      * Parameters:
          > aClockwise: the direction of rotation.
-         > aTryOffsets: a flag that, when true, indicates that the piece should be offset in the event that it cannot 
-                          be directly rotated into a valid position.
          > aGrid: the grid on which the block is displayed.
+         > aTryOffsets: a flag that, when true, indicates that the piece should be offset in the event that it cannot 
+           be directly rotated into a valid position.
          
      * Return Value:
          > A boolean indicating whether or not the block was successfully rotated. 
-                           
     */
-    Rotate(aClockwise, aGrid, aTryOffsets = true)
+    Rotate(aClockwise, aGrid, aTryOffsets = true, aForceRotation = false)
     {
         if (aTryOffsets)
         { aGrid.UnDrawBlock(this); }
@@ -204,14 +210,13 @@ class Block
         if (!aTryOffsets)
         { return false; }
 
-        console.log("Attempted Coordinates of Block Rotation: " + this.#fPositions);
-        
+        //console.log("Attempted Coordinates of Block Rotation: " + this.#fPositions);
         // Try to find a valid placement for the block by using the offset data (record result in lIsRotationPossible).
         const lIsRotationPossible = this.OffSet(lIndexRotationOld, this.#fIndexRotation, aGrid);
-        
+
         // If the block can't be rotated (even after trying all available offsets), rotate back to the original 
-        // position.
-        if (!lIsRotationPossible)
+        // position (unless the 'force' flag is set).
+        if (!lIsRotationPossible && !aForceRotation)
         {
             this.Rotate(!aClockwise, aGrid, false);
         }
@@ -260,7 +265,7 @@ class Block
         }
         
         if (aUpdateGrid)
-        { aGrid.DrawBlock(this); }
+        { aGrid.DrawBlock(this, false); }
         
         return lCanMove;
     }
@@ -278,6 +283,31 @@ class Block
         aGrid.DrawBlock(this, aDrawShadow);
 
         return lLengthDrop;
+    }
+
+    /*
+    * Moves the block as far as possible in the given direction.
+    * Returns the length of the shift: i.e. how many times it moved.
+
+    * Parameters:
+        > aGrid: the grid on which to move the block. The block should already be on the grid.
+        > aDirection: the direction in which to move. This should be a Vector2D object with a magnitude of 1: use the 
+          static fields defined in Vector2D (i.e. s_up, s_down, s_left, and s_right).
+        > aDrawShadow: whether or not the block's 'shadown' should also be drawn.
+    */
+    Shift(aGrid, aDirection = Vector2D.s_up, aDrawShadow = true)
+    {
+        aGrid.UnDrawBlock(this, aDrawShadow);
+
+        let lLengthShift = 0;
+
+        // Drop the block.
+        while(this.Move(aDirection, aGrid, false))
+            ++lLengthShift;
+
+        aGrid.DrawBlock(this, aDrawShadow);
+
+        return lLengthShift;
     }
     
     /*
@@ -321,6 +351,13 @@ class Block
     {
         return this.#fPositions;
     }
+
+    /* Accessor of f_position.
+    */
+    get indexRotation()
+    {
+        return this.#fIndexRotation;
+    }
     
     
 // (d)(ii). Mutators (1) -----------------------------------------------------------------------------------------------
@@ -330,7 +367,7 @@ class Block
         this.#fType = aType;
     }
 
-    set index_rotation(aIndex)
+    set indexRotation(aIndex)
     {
         this.#fIndexRotation = aIndex;
     }
@@ -419,9 +456,19 @@ class Block
 
             default :
                 console.log("Unknown Block");
-            
         }
-        
+
+        // The number of times the block must be rotated (the block is set to the 0th rotation position above).
+        const lNumRotations = this.#fIndexRotation;
+
+        for (let i = 0; i < lNumRotations; ++i)
+        {
+            for (let j = 0; j < this.#fPositions.length; ++j)
+            {
+                this.RotateTilePosition(0, j, true);
+            }
+        }
+
     }
 
     set colour(aColour)
@@ -429,7 +476,18 @@ class Block
         this.#fColour = aColour;
     }
     
-    
+    changeRotationIndex(aClockwise)
+    {
+        // Increment/decrement this.#fIndexRotation according to aClockwise.
+        if (aClockwise)
+        {
+            this.#fIndexRotation = (this.#fIndexRotation + 1) % Block.sNumRotationIndexes;
+        }
+        else
+        {
+            this.#fIndexRotation = (this.#fIndexRotation == 0) ? Block.sNumRotationIndexes - 1 : this.#fIndexRotation - 1;
+        }
+    }
     
 // (e). Auxiliaries (3) ================================================================================================
     
@@ -438,7 +496,7 @@ class Block
      
      * Parameters:
          > aIndexOrigin: the index of this.#fPositions corresponding to the coordinate that is considered the block's 
-                           origin/centre.
+           origin/centre.
          > aIndexPos: the index of this.#fPositions of the coordinate to be rotated about the coordinate at aIndexOrigin.
          > aClockwise: a flag that, when true, indicates that the coordinate should be rotated clockwise.
     */
@@ -507,20 +565,20 @@ class Block
              
              if (this.Move(l_offset_relative, aGrid, false))
              {
-                 console.log("============================================================");
-                 console.log("Offset Data Index: " + l_index_offset);
-                 console.log("Roation Indexes: " + aIndexRotationOld + " to " + aIndexRotationNew);
-                 console.log("Offset Vector: " + l_offset_relative);
+                //  console.log("============================================================");
+                //  console.log("Offset Data Index: " + l_index_offset);
+                //  console.log("Roation Indexes: " + aIndexRotationOld + " to " + aIndexRotationNew);
+                //  console.log("Offset Vector: " + l_offset_relative);
                  return true;
              }
 
             if (l_index_offset == 5)
             {
-                console.log("============================================================");
-                console.log("5 didn't work");
-                console.log("Offset Data Index: " + l_index_offset);
-                console.log("Roation Indexes: " + aIndexRotationOld + " to " + aIndexRotationNew);
-                console.log("Offset Vector: " + l_offset_relative);
+                // console.log("============================================================");
+                // console.log("5 didn't work");
+                // console.log("Offset Data Index: " + l_index_offset);
+                // console.log("Roation Indexes: " + aIndexRotationOld + " to " + aIndexRotationNew);
+                // console.log("Offset Vector: " + l_offset_relative);
             }
 
             ++l_index_offset;

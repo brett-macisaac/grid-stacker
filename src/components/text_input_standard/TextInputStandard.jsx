@@ -213,7 +213,8 @@ const styles =
         border: "1px solid",
         flexDirection: "row",
         justifyContent: "space-between",
-        overflowY: "scroll"
+        overflowY: "scroll",
+        flexShrink: 0
     },
     textElement:
     {

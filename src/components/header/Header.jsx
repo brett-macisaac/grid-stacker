@@ -50,7 +50,7 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
         {
             const lBlockType = utils.GetFromLocalStorage(lclStrgKeyBlockType, "I");
 
-            console.log("Header block: " + lBlockType);
+            //console.log("Header block: " + lBlockType);
 
             setBlock(new Block(lBlockType));
         },
@@ -65,7 +65,7 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
 
         const lIndexNextBlock = (lIndexCurrentBlock + 1) % lBlockTypes.length;
 
-        console.log("New Block: " + lBlockTypes[lIndexNextBlock])
+        //console.log("New Block: " + lBlockTypes[lIndexNextBlock])
 
         setBlock(new Block(lBlockTypes[lIndexNextBlock]));
 
@@ -78,8 +78,6 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
     useEffect(
         () =>
         {
-            console.log("Update grid");
-
             setGrid(
                 (prev) => 
                 {
@@ -88,8 +86,6 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
                     lCopy.Reset();
 
                     lCopy.DrawBlockAt(block, Grid.DrawPosition.CentreMid, false);
-
-                    console.log("Updating grid");
 
                     return lCopy;
                 }

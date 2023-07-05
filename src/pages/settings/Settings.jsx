@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Brightness4 from '@mui/icons-material/Brightness4';
-import Help from '@mui/icons-material/Help';
+import SportsEsports from '@mui/icons-material/SportsEsports';
+import Info from '@mui/icons-material/Info'; 
 
 import globalProps, { utilsGlobalStyles } from '../../styles';
 import consts from '../../utils/constants.js';
@@ -11,6 +12,7 @@ import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
 import ThemeContext from "../../contexts/ThemeContext.js";
 import ButtonNextPage from '../../components/button_next_page/ButtonNextPage';
 import PageContainer from '../../components/page_container/PageContainer';
+import TextBlocks from '../../components/text_blocks/TextBlocks';
 
 function Settings() 
 {
@@ -27,6 +29,12 @@ function Settings()
             style = { styles.container }
         >
 
+            <TextBlocks 
+                prText = "SETTINGS" prSizeText = { 35 } 
+                prColourBackground = { theme.emptyGridCell } 
+                prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
+            />
+
             <ButtonNextPage 
                 text = "Themes" 
                 sizeText = { 1 }
@@ -40,11 +48,23 @@ function Settings()
             />
 
             <ButtonNextPage 
-                text = "Help" 
+                text = "About" 
                 sizeText = { 1 }
                 isBold
                 icon = { 
-                    <Help 
+                    <Info 
+                        sx = {{ color: theme.fontButtonContent, fontSize: globalProps.sizeIconHeaderFooter }} 
+                    /> 
+                }
+                onPress = { () => navigate("/gameInfo") }
+            />
+
+            <ButtonNextPage 
+                text = "Controls" 
+                sizeText = { 1 }
+                isBold
+                icon = { 
+                    <SportsEsports 
                         sx = {{ color: theme.fontButtonContent, fontSize: globalProps.sizeIconHeaderFooter }} 
                     /> 
                 }

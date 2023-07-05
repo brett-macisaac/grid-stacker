@@ -30,8 +30,8 @@ function Container({ children, style })
     return ( 
         <div 
             style = {{ 
-                ...style, ...styles.container, width: globalProps.widthCon, backgroundColor: theme.content,
-                borderColor: theme.borders 
+                ...styles.container, width: globalProps.widthCon, backgroundColor: theme.content,
+                borderColor: theme.borders, ...style,
             }}
         >
 
