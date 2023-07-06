@@ -16,7 +16,6 @@ import WindowSizeContext from '../../contexts/WindowSizeContext.js';
 import utils from '../../utils/utils';
 import utilsAppSpecific from '../../utils/utils_app_specific';
 import consts from '../../utils/constants';
-import { get } from 'lodash';
 
 /*
 * A local storage key for the high-scores.
