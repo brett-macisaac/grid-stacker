@@ -6,7 +6,7 @@ import globalProps, { utilsGlobalStyles } from '../../styles';
 import GridDisplayer from "../grid_displayer/GridDisplayer.jsx";
 import GridChar from "../../classes/GridChar.js";
 
-function TextBlocks({ prText, prSizeText, prStyle, prIsHorizontal, prColourBackground, prColourEmptyCell, prColourText, prColourBorder })
+function TextBlocks({ prText, prSizeText, prStyle, prIsHorizontal, prColourBackground, prColourEmptyCell, prColourText, prColourPattern, prColourBorder })
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -21,6 +21,8 @@ function TextBlocks({ prText, prSizeText, prStyle, prIsHorizontal, prColourBackg
             }
         )
     );
+
+    let lIndexColourPattern = 0;
 
     return (
         <div style = {{ ...styles.container, ...prStyle, columnGap: prSizeText * 0.6 }}>
@@ -41,7 +43,12 @@ function TextBlocks({ prText, prSizeText, prStyle, prIsHorizontal, prColourBackg
                                     pWordGridified.map(
                                         (pCharGridified, pIndex2) =>
                                         {
-                                            if (prColourText)
+                                            if (prColourPattern)
+                                            {
+                                                pCharGridified.setColour(prColourPattern[lIndexColourPattern]);
+                                                lIndexColourPattern = (lIndexColourPattern + 1) % prColourPattern.length;
+                                            }
+                                            else if (prColourText)
                                             {
                                                 pCharGridified.setColour(prColourText);
                                             }
@@ -79,6 +86,7 @@ TextBlocks.propTypes =
     prIsHorizontal: PropTypes.bool,
     prColourBackground: PropTypes.string,
     prColourText: PropTypes.string,
+    prColourPattern: PropTypes.arrayOf(PropTypes.string),
     prColourBorder: PropTypes.string
 };
 

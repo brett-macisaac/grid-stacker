@@ -19,6 +19,7 @@ import TextBlocks from '../../components/text_blocks/TextBlocks';
 import utils from '../../utils/utils';
 import consts from '../../utils/constants';
 import ThemeContext from "../../contexts/ThemeContext.js";
+import utilsAppSpecific from '../../utils/utils_app_specific';
 
 function Menu({}) 
 {
@@ -61,16 +62,13 @@ function Menu({})
                 <CountLabel text = "Global" count = { totalGamesGlobal.current } style = { styles.countLabel } />
             </Container>
 
-            {/* Another container that displays popular games on this device. */}
-
             {/* <TextBlocks 
-                prText = "05 X 10" prSizeText = { 25 } 
+                prText = "GS" prSizeText = { 300 } 
                 prColourBackground = { theme.emptyGridCell } 
-                prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 5 }} 
+                prColourPattern = { [ utilsAppSpecific.getRandomBlockColour(), utilsAppSpecific.getRandomBlockColour() ] }
+                prStyle = {{ ...styles.title, justifyContent: "center", alignItems: "center", backgroundColor: theme.emptyGridCell, width: 600, height: 600, flexShrink: 0 }} 
             /> */}
 
-            {/* Put stats here: e.g. "Number of games you've played, number of games played by everyone, etc." */}
-            
         </PageContainer>
     );
 }

@@ -133,9 +133,9 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
 
                     <div style = { styles.conGrid }>
                         {
-                            prGrid.instance && (
+                            prGrid && (
                                 <GridDisplayer 
-                                    prGrid = { prGrid.instance } 
+                                    prGrid = { prGrid } 
                                     prMaxWidth = { gMaxWidthGameGrid } 
                                     prMaxHeight = { gMaxHeightGameGrid } 
                                 />

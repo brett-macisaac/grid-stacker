@@ -61,7 +61,13 @@ function Game()
 
     const [ updater, setUpdater ] = useState(false);
     
-    const [ grid, setGrid ] = useState({ instance: gGrid });
+    //const [ grid, setGrid ] = useState({ instance: rfGrid.current });
+
+    const rfGrid = useRef(
+        new Grid(location.state.cols, location.state.rows)  
+    );
+
+    const rfBlock = useRef(undefined);
 
     const stats = useRef(
         {
@@ -90,8 +96,8 @@ function Game()
         () =>
         {
             // Initialise the grid.
-            gGrid = new Grid(location.state.cols, location.state.rows);
-            updateGridState();
+            //rfGrid.current = new Grid(location.state.cols, location.state.rows);
+            //reRender();
 
             const lHighScores = utils.GetFromLocalStorage(consts.lclStrgKeyHighScores);
 
@@ -147,11 +153,11 @@ function Game()
         []
     );
 
-    const updateGridState = () =>
-    {
-        //setGrid(prev => { return { ...prev } });
-        setGrid({ instance: gGrid });
-    }
+    // const updateGridState = () =>
+    // {
+    //     //setGrid(prev => { return { ...prev } });
+    //     setGrid({ instance: rfGrid.current });
+    // }
 
     const handlePlay = async () =>
     {
@@ -162,11 +168,15 @@ function Game()
         rfGameInProgress.current = true;
 
         // Reset the game's state.
-        gGrid.Reset(); updateGridState();
+        //rfGrid.current.Reset(); reRender();
+        rfGrid.current.Reset();
         resetScoreAndLines(0, 0);
         resetTallies();
         resetNextBlocks();
         heldBlock.current = undefined;
+        reRender();
+
+        console.log(rfGrid.current);
 
         // The current period that defines the block's fall rate.
         let lFallPeriodCurrent = gFallPeriodMax;
@@ -193,7 +203,7 @@ function Game()
             if (moveBlock(Vector2D.s_up, true))
             { continue; }
 
-            gBlock = undefined;
+            rfBlock.current = undefined;
 
             // Reset the gSoftDrop flag.
             gSoftDrop = false;
@@ -212,7 +222,7 @@ function Game()
                 
                 // If all rows have been cleared (i.e. the grid is empty) double the line clears score.
                 // If all rows have been cleared, this is known as a 'perfect clear'.
-                if (gGrid.IsEmpty())
+                if (rfGrid.current.IsEmpty())
                 { 
                     console.log("Perfect clear!");
                     lScoreFromLineClears *= 2;
@@ -300,7 +310,7 @@ function Game()
         let lNumFullRows = 0;
 
         // The dimensions of the grid.
-        const lGridDimensions = gGrid.dimension;
+        const lGridDimensions = rfGrid.current.dimension;
 
         for (let row = lGridDimensions.rows - 1; row >= 0; --row)
         {   
@@ -313,7 +323,7 @@ function Game()
                 {
                     break;
                 }
-                else if (gGrid.IsTileEmpty(col, row))
+                else if (rfGrid.current.IsTileEmpty(col, row))
                 {
                     // If at least one tile is empty, the row can't be full.
                     lIsRowFull = false;
@@ -333,12 +343,12 @@ function Game()
                 // Clear the row.
                 for (let col = 0; col < lGridDimensions.columns; ++col)
                 {
-                    if (gGrid.IsTileEmpty(col, row))
+                    if (rfGrid.current.IsTileEmpty(col, row))
                     { continue; }
 
                     // Clear the colour of the tile at coordinate (col,row).
-                    gGrid.EmptyTile(col, row);
-                    updateGridState();
+                    rfGrid.current.EmptyTile(col, row);
+                    reRender();
 
                     await utils.SleepFor(lLengthPause);
                 }
@@ -352,16 +362,16 @@ function Game()
                 // Shift the (non-full, non-empty) row down lNumFullRows rows.
                 for (let col = 0; col < lGridDimensions.columns; ++col)
                 {
-                    if (gGrid.IsTileEmpty(col, row))
+                    if (rfGrid.current.IsTileEmpty(col, row))
                     { continue; }
 
                     // Copy the colour of the tile at coordinate (col,row) to the appropriate row (row + lNumFullRows).
-                    gGrid.SetTileColour(col, row + lNumFullRows, gGrid.GetTile(col, row));
+                    rfGrid.current.SetTileColour(col, row + lNumFullRows, rfGrid.current.GetTile(col, row));
 
                     // Clear the colour of the tile at coordinate (col,row).
-                    gGrid.EmptyTile(col, row);
+                    rfGrid.current.EmptyTile(col, row);
 
-                    updateGridState();
+                    reRender();
 
                     await utils.SleepFor(lLengthPause);
                 }
@@ -374,16 +384,16 @@ function Game()
         return lNumFullRows;
     };
 
-    const moveBlock = (pMovement, pCalledByGameLoop = false) =>
+    const moveBlock = (pMovement) =>
     {
-        if (!(gBlock instanceof Block))
+        if (!(rfBlock.current instanceof Block))
         {
             console.log("The block cannot be moved, as it doesn't exist.");
             return false;
         }
 
-        let lDidMove = gBlock.Move(pMovement, gGrid, true);
-        updateGridState();
+        let lDidMove = rfBlock.current.Move(pMovement, rfGrid.current, true);
+        reRender();
     
         return lDidMove;
     };
@@ -396,14 +406,14 @@ function Game()
     */
     const rotateBlock = (pClockwise) =>
     {
-        if (!(gBlock instanceof Block))
+        if (!(rfBlock.current instanceof Block))
         {
             console.log("The block cannot be rotated, as it doesn't exist.");
             return false;
         }
 
-        let lDidRotate = gBlock.Rotate(pClockwise, gGrid, true)
-        updateGridState();
+        let lDidRotate = rfBlock.current.Rotate(pClockwise, rfGrid.current, true);
+        reRender();
         
         return lDidRotate;
     }
@@ -413,15 +423,15 @@ function Game()
     */
     const rotateBlock180 = () =>
     {
-        if (!(gBlock instanceof Block))
+        if (!(rfBlock.current instanceof Block))
         {
             console.log("The block cannot be rotated, as it doesn't exist.");
             return false;
         }
 
-        let lDidRotate = gBlock.Rotate180(gGrid);
-        updateGridState();
-        
+        let lDidRotate = rfBlock.current.Rotate180(rfGrid.current);
+        reRender();
+
         return lDidRotate;
     }
 
@@ -458,24 +468,25 @@ function Game()
 
     const shiftBlock = (pDirection) =>
     {
-        gBlock.Shift(gGrid, pDirection, false);
-        updateGridState();
+        rfBlock.current.Shift(rfGrid.current, pDirection, false);
+        reRender();
     };
 
     const spawnNextBlock = () =>
     {
-        // If gBlock has already been set (e.g. from the player 'holding' a block), do not spawn a new block in.
+        // If rfBlock has already been set (e.g. from the player 'holding' a block), do not spawn a new block in.
         // i.e. a block should only be spawned if it's undefined.
-        if (gBlock)
+        if (rfBlock.current)
         {
             return;
         }
 
-        gBlock = nextBlocks.current[nextBlocks.current.length - 1].copy();
+        rfBlock.current = nextBlocks.current[nextBlocks.current.length - 1].copy();
         isBlockThePrevHeldBlock.current = false;
 
-        let lCanSpawn = gGrid.DrawBlockAt(gBlock, Grid.DrawPosition.TopTwoRows, false);
-        updateGridState();
+        //let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
+        //reRender();
+        let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
 
         const lBlocks = location.state.blocks.split('');
 
@@ -485,14 +496,16 @@ function Game()
         ];
 
         if (lCanSpawn)
-            incrementTally(gBlock.type);
+            incrementTally(rfBlock.current.type);
+
+        reRender();
 
         return lCanSpawn;
     }
 
     const holdBlock = () =>
     {
-        if (!(gBlock instanceof Block))
+        if (!(rfBlock.current instanceof Block))
         {
             console.log("The block cannot be held, as it doesn't exist.");
             return false;
@@ -502,27 +515,29 @@ function Game()
         if (isBlockThePrevHeldBlock.current)
         { return; }
 
-        gGrid.UnDrawBlock(gBlock);
+        rfGrid.current.UnDrawBlock(rfBlock.current);
 
         if (!heldBlock.current)
         {
-            heldBlock.current = gBlock.copy();
+            heldBlock.current = rfBlock.current.copy();
 
-            gBlock = undefined;
+            rfBlock.current = undefined;
 
             spawnNextBlock();
         }
         else
         {
-            const lBlockCurrent = gBlock.copy();
+            const lBlockCurrent = rfBlock.current.copy();
 
-            gBlock = heldBlock.current;
+            rfBlock.current = heldBlock.current;
             isBlockThePrevHeldBlock.current = true;
 
             heldBlock.current = lBlockCurrent;
 
-            let lCanSpawn = gGrid.DrawBlockAt(gBlock, Grid.DrawPosition.TopTwoRows, false);
-            updateGridState();
+            // let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
+            // reRender();
+            rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
+            reRender();
         }
     };
 
@@ -707,7 +722,7 @@ function Game()
 
     const handleKeyDown = (pEvent) =>
     {
-        if (!gBlock || !rfGameInProgress.current)
+        if (!rfBlock.current || !rfGameInProgress.current)
         { return; }
 
         // The key that was pressed down.
@@ -797,7 +812,8 @@ function Game()
     {
         return (
             <GameLandscape 
-                prGrid = { grid }
+                //prGrid = { grid }
+                prGrid = { rfGrid.current }
                 prBlockTallies = { blockTallies }
                 prNextBlocks = { nextBlocks.current }
                 prGridHold = { lGridHold }
@@ -814,7 +830,8 @@ function Game()
     {
         return (
             <GamePortrait 
-                prGrid = { grid }
+                //prGrid = { grid }
+                prGrid = { rfGrid.current }
                 prBlockTallies = { blockTallies }
                 prNextBlocks = { nextBlocks.current }
                 prGridHold = { lGridHold }
@@ -874,10 +891,5 @@ const gScoresLineClears = [ 40, 100, 300, 1200 ];
 
 // A flag that, when true, indicates that the block should be 'soft dropped'.
 let gSoftDrop = false;
-
-// The current block that the user can move on the grid.
-let gBlock = undefined;
-
-let gGrid = undefined;
 
 export default Game;

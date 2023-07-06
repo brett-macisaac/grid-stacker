@@ -10,7 +10,7 @@ import PageContainer from '../../components/page_container/PageContainer';
 import ThemeContext from '../../contexts/ThemeContext';
 import TextBlocks from '../../components/text_blocks/TextBlocks';
 
-function GameInfo() 
+function About() 
 {
     const navigate = useNavigate();
 
@@ -265,4 +265,4 @@ const styles =
 
 };
 
-export default GameInfo;
+export default About;

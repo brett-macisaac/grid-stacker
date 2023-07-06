@@ -6,6 +6,7 @@ import React, { useContext, useState, useEffect } from "react";
 import ThemeContext from "../../contexts/ThemeContext.js";
 import globalProps from '../../styles';
 import HeaderButton from "../header_button/HeaderButton.jsx";
+import TextBlocks from '../text_blocks/TextBlocks.jsx';
 import Grid from '../../classes/Grid.js';
 import GridDisplayer from '../grid_displayer/GridDisplayer.jsx';
 import Block from '../../classes/Block.js';
@@ -13,11 +14,12 @@ import ButtonStandard from "../button_standard/ButtonStandard.jsx";
 import consts from "../../utils/constants.js";
 import utils from "../../utils/utils.js";
 import "./Header.css";
+import utilsAppSpecific from '../../utils/utils_app_specific.js';
 
 /*
-* An AsyncStorage key whose value is the number of the pool ball that's displayed in the header.
+* A local storage key whose value is the pair of colours that are used for the header's logo.
 */
-const lclStrgKeyBlockType = "HeaderBlockType";
+const glclStrgKeyLogoColours = "HeaderLogoColours";
 
 /*
 * The custom header component that's used by the PageContainer component.
@@ -38,61 +40,30 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
     const { themeName } = useContext(ThemeContext);
     let theme = globalProps.themes[themeName];
 
-    const [ grid, setGrid ] = useState(new Grid(5, 5));
+    const [ stLogoColours, setLogoColours ] = useState(
+        utils.GetFromLocalStorage(
+            glclStrgKeyLogoColours, 
+            [ utilsAppSpecific.getRandomBlockColour(), utilsAppSpecific.getRandomBlockColour() ]
+        )
+    );
 
-    const [ block, setBlock ] = useState(new Block());
-
-    /*
-    * Set the ball number to the one stored locally on the user's device.
-    */
     useEffect(
         () =>
         {
-            const lBlockType = utils.GetFromLocalStorage(lclStrgKeyBlockType, "I");
-
-            //console.log("Header block: " + lBlockType);
-
-            setBlock(new Block(lBlockType));
         },
         []
     );
 
-    const cycleBlock = () => 
+    const randomiseLogoColours = () =>
     {
-        const lBlockTypes = Object.keys(Block.Type);
+        const lLogoColoursNew = [ 
+            utilsAppSpecific.getRandomBlockColour(), utilsAppSpecific.getRandomBlockColour() 
+        ];
 
-        const lIndexCurrentBlock = lBlockTypes.indexOf(block.type);
+        setLogoColours(lLogoColoursNew);
 
-        const lIndexNextBlock = (lIndexCurrentBlock + 1) % lBlockTypes.length;
-
-        //console.log("New Block: " + lBlockTypes[lIndexNextBlock])
-
-        setBlock(new Block(lBlockTypes[lIndexNextBlock]));
-
-        utils.SetInLocalStorage(lclStrgKeyBlockType, lBlockTypes[lIndexNextBlock]);
+        utils.SetInLocalStorage(glclStrgKeyLogoColours, lLogoColoursNew);
     };
-
-    /*
-    * Update the grid every time the block changes.
-    */
-    useEffect(
-        () =>
-        {
-            setGrid(
-                (prev) => 
-                {
-                    const lCopy = prev.copy();
-
-                    lCopy.Reset();
-
-                    lCopy.DrawBlockAt(block, Grid.DrawPosition.CentreMid, false);
-
-                    return lCopy;
-                }
-            );
-        },
-        [ block ]
-    );
   
     return (
         <div 
@@ -120,23 +91,16 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
                 }
             </div>
 
-            <GridDisplayer prGrid = { grid } prMaxWidth = { 40 } prMaxHeight = { 40 } prOnClick = { cycleBlock } />
-
-            {/* Put a grid here instead, maybe 4x4 with a piece that changes everytime the user clicks it. */}
-            {/* <ButtonStandard
-                onPress = { incrementBallNumber }
-                activeOpacity = { 1 }
-                style = {{ 
-                    ...styles.btnBall, borderColor: theme.selected
-                }}
+            <div 
+                style = {{ ...styles.conLogo, backgroundColor: theme.emptyGridCell }}
+                onClick = { randomiseLogoColours }
             >
-                <PoolBall 
-                    number = { ballNumber } 
-                    potted = { false } 
-                    selected = { false }
-                    sizeBall = { 46 }
+                <TextBlocks 
+                    prText = "GS" prSizeText = { 40 } 
+                    prColourBackground = { theme.emptyGridCell } 
+                    prColourPattern = { stLogoColours }
                 />
-            </ButtonStandard> */}
+            </div>
 
             <div style = { { ...styles.sideContainer, ...styles.rightContainer } }>
                 {
@@ -212,14 +176,11 @@ const styles =
     {
         justifyContent: "flex-end",
     },
-    btnBall:
+    conLogo:
     {
-        backgroundColor: 'transparent', 
-        width: 48, 
-        height: 48, 
-        borderRadius: 24,
-        borderWidth: 2,
-        borderStyle: "solid"
+        justifyContent: "center", 
+        alignItems: "center", 
+        padding: 5
     }
 };
 

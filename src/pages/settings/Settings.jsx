@@ -56,7 +56,7 @@ function Settings()
                         sx = {{ color: theme.fontButtonContent, fontSize: globalProps.sizeIconHeaderFooter }} 
                     /> 
                 }
-                onPress = { () => navigate("/gameInfo") }
+                onPress = { () => navigate("/about") }
             />
 
             <ButtonNextPage 
@@ -68,7 +68,7 @@ function Settings()
                         sx = {{ color: theme.fontButtonContent, fontSize: globalProps.sizeIconHeaderFooter }} 
                     /> 
                 }
-                onPress = { () => navigate("/gameInfo") }
+                onPress = { () => navigate("/controls") }
             />
 
         </PageContainer>

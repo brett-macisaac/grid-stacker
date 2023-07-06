@@ -187,9 +187,9 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
 
             <div style = {{ ...styles.conGrid, ...styles.con, borderColor: theme.content }}>
                 {
-                    prGrid.instance && (
+                    prGrid && (
                         <GridDisplayer 
-                            prGrid = { prGrid.instance } 
+                            prGrid = { prGrid } 
                             prMaxWidth = { gMaxWidthGameGrid } 
                             prMaxHeight = { gMaxHeightGameGrid } 
                         />
