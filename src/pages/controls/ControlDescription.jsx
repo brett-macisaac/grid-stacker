@@ -48,7 +48,7 @@ function ControlDescription({ prTitle, prDescription, prScreenControl, prIsScree
                                 <div
                                     style = {{ 
                                         ...styles.btnGameControl, 
-                                        border: `1px solid ${prScreenControl.randomColour}`,
+                                        border: `1px solid ${prScreenControl.colour}`,
                                         backgroundColor: theme.emptyGridCell,
                                     }}
                                 >

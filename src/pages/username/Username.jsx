@@ -75,7 +75,7 @@ function Username()
     {
         if (username == "")
         {
-            setOptionsPopUpMsg(PopUpOk("Not enough names!", "You must give each player a name before you can start."));
+            setOptionsPopUpMsg(PopUpOk("No Username", "You must enter a username to play."));
             return;
         }
 

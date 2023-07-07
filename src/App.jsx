@@ -30,7 +30,7 @@ const gLclStrgKeyThemeName = "themeName";
 /*
 * Default game preferences.
 */
-const gPrefsDefault = { cols: 4, rows: 9, username: "-", blocks: "IJLOSTZ" };
+const gPrefsDefault = { cols: 4, rows: 9, username: "", blocks: "IJLOSTZ" };
 
 function App() 
 {
