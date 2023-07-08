@@ -32,7 +32,7 @@ function ButtonTheme({ themeName, onPress, height, width, isSelected })
                 borderStyle: "solid",
                 ...styles.container,
             }}
-            activeOpacity = { 0.8 } // Changes the component's opacity when pressed.
+            // activeOpacity = { 0.8 } // Changes the component's opacity when pressed.
         >
 
             <div 

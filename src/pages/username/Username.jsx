@@ -52,7 +52,7 @@ function Username()
 
             setPrevPlayers(lPrevPlayers);
 
-            console.log(lPrevPlayers);
+            //console.log(lPrevPlayers);
         },
         []
     );

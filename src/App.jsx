@@ -48,7 +48,7 @@ function App()
 
     const updatePrefs = (pPrefPropKey, pPrefPropValue) =>
     {
-        console.log("Updating preference: " + pPrefPropKey);
+        //console.log("Updating preference: " + pPrefPropKey);
         if (!prefs.hasOwnProperty(pPrefPropKey))
         {
             console.log("Invalid preference property!");
@@ -65,7 +65,6 @@ function App()
     const updateWindowSize = () =>
     {
         setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-        console.log("Window size updated!");
     };
 
     /*
@@ -120,17 +119,6 @@ function App()
         },
         []
     );
-
-    /*
-    * Initialise the values of the contexts,
-    */
-    // useEffect(
-    //     () =>
-    //     {
-    //         Grid.sColourEmptyTile = theme.emptyGridCell;
-    //     },
-    //     [themeName]
-    // );
 
     return (
         <ThemeContext.Provider value = {{ themeName, updateTheme }}>
