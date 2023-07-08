@@ -223,7 +223,7 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
                                                     border: `1px solid ${pSymbol.colour}`,
                                                     alignSelf: lAlignSelf
                                                 }}
-                                                onPress = { lOnPress }
+                                                onPress = { lOnPress } isOnDown
                                             >
                                                 <GridDisplayer 
                                                     prGrid = { pSymbol.grid } 
@@ -254,7 +254,7 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
                                                     border: `1px solid ${pSymbol.colour}`,
                                                     alignSelf: lAlignSelf
                                                 }}
-                                                onPress = { lOnPress }
+                                                onPress = { lOnPress } isOnDown
                                             >
                                                 <GridDisplayer 
                                                     prGrid = { pSymbol.grid } 

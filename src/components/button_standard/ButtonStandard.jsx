@@ -84,8 +84,22 @@ function ButtonStandard({ children, icon, text, sizeText, isBold, onPress, onSin
     let lPressFunctions = { };
     if (isOnDown)
     {
-        lPressFunctions.onMouseDown = handlePress;
-        lPressFunctions.onTouchStart = (e) => { e.preventDefault(); handlePress() };
+        /*
+        * React has made the onTouchStart event passive, meaning preventDefault cannot be used to prevent the 
+        onMouseDown event from firing. Therefore, they both can't be used simulataneously as in the prototype.
+        */
+
+        // Whether the device has a touch-screen.
+        const lIsTouchDevice = 'ontouchstart' in window;
+
+        if (lIsTouchDevice)
+        {
+            lPressFunctions.onTouchStart = handlePress;
+        }
+        else
+        {
+            lPressFunctions.onMouseDown = handlePress;
+        }
     }
     else
     {
