@@ -211,8 +211,6 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
                                 lGameButtonSymbolsTop.map(
                                     (pSymbol, pIndex) =>
                                     {
-                                        const lAlignSelf = pIndex % 2 == 1 ? "flex-end" : "flex-start";
-
                                         const lOnPress = prHandlers[pSymbol.name] ? prHandlers[pSymbol.name] : () => { console.log("No handler assigned."); };
 
                                         return (
@@ -221,7 +219,7 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
                                                 style = {{ 
                                                     ...styles.btnGameControl, 
                                                     border: `1px solid ${pSymbol.colour}`,
-                                                    alignSelf: lAlignSelf
+                                                    width: gMaxWidthGameButton, height: gMaxHeightGameButton
                                                 }}
                                                 onPress = { lOnPress } isOnDown
                                             >
@@ -242,8 +240,6 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
                                 lGameButtonSymbolsBottom.map(
                                     (pSymbol, pIndex) =>
                                     {
-                                        const lAlignSelf = pIndex % 2 == 1 ? "flex-end" : "flex-start";
-
                                         const lOnPress = prHandlers[pSymbol.name] ? prHandlers[pSymbol.name] : () => { console.log("No handler assigned."); };
 
                                         return (
@@ -252,7 +248,7 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
                                                 style = {{ 
                                                     ...styles.btnGameControl, 
                                                     border: `1px solid ${pSymbol.colour}`,
-                                                    alignSelf: lAlignSelf
+                                                    width: gMaxWidthGameButton, height: gMaxHeightGameButton
                                                 }}
                                                 onPress = { lOnPress } isOnDown
                                             >
@@ -327,7 +323,7 @@ const styles =
         //backgroundColor: "#005304",
         padding: utilsGlobalStyles.spacingVertN(-3),
         rowGap: utilsGlobalStyles.spacingVertN(-2),
-        justifyContent: "space-between",
+        justifyContent: "center",
         alignItems: "center",
     },
     conTopMid:
@@ -349,6 +345,7 @@ const styles =
     infoPanelRight:
     {
         borderLeft: "2px solid",
+        rowGap: utilsGlobalStyles.spacingVertN()
     },
     conNextBlocks:
     {
@@ -380,8 +377,8 @@ const styles =
     conGameControls:
     {
         height: "100%",
-        padding: utilsGlobalStyles.spacingVertN(-2),
-        rowGap: 0,
+        padding: 4, //utilsGlobalStyles.spacingVertN(-2),
+        rowGap: 4,
         justifyContent: "space-between",
         alignItems: "center"
     },
@@ -389,7 +386,7 @@ const styles =
     {
         height: "50%",
         flexDirection: "row",
-        columnGap: utilsGlobalStyles.spacingVertN(-1),
+        columnGap: 4, //utilsGlobalStyles.spacingVertN(-1),
         alignItems: "center"
     },
     btnGameControl:

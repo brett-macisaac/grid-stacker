@@ -118,8 +118,6 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                     lGameButtonSymbolsLeft.map(
                         (pSymbol, pIndex) =>
                         {
-                            const lAlignSelf = pIndex % 2 == 1 ? "flex-end" : "flex-start";
-
                             const lOnPress = prHandlers[pSymbol.name] ? prHandlers[pSymbol.name] : () => { console.log("No handler assigned."); };
 
                             return (
@@ -127,7 +125,7 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                                     key = { pIndex }
                                     style = {{ 
                                         ...styles.btnGameControl, border: `1px solid ${pSymbol.colour}`,
-                                        alignSelf: lAlignSelf
+                                        width: gMaxWidthGameButton, height: gMaxHeightGameButton
                                     }}
                                     onPress = { lOnPress } isOnDown
                                 >
@@ -237,7 +235,7 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
 
             <div 
                 style = {{ 
-                    ...styles.conControls, ...styles.con, borderColor: theme.content, 
+                    ...styles.conControls, ...styles.con, ...styles.conRightMost, borderColor: theme.content, 
                     justifyContent: prGameInProgress ? "space-between" : "center" 
                 }}
             >
@@ -259,8 +257,6 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                     lGameButtonSymbolsRight.map(
                         (pSymbol, pIndex) =>
                         {
-                            const lAlignSelf = pIndex % 2 == 1 ? "flex-start" : "flex-end";
-
                             const lOnPress = prHandlers[pSymbol.name] ? prHandlers[pSymbol.name] : () => { console.log("No handler assigned."); };
 
                             return (
@@ -268,7 +264,7 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                                     key = { pIndex }
                                     style = {{ 
                                         ...styles.btnGameControl, border: `1px solid ${pSymbol.colour}`, 
-                                        alignSelf: lAlignSelf 
+                                        width: gMaxWidthGameButton, height: gMaxHeightGameButton
                                     }}
                                     onPress = { lOnPress } isOnDown
                                 >
@@ -326,9 +322,9 @@ const styles =
     {
         //backgroundColor: "#0A0AA1",
         width: "15%",
-        padding: utilsGlobalStyles.spacingVertN(-2),
-        rowGap: utilsGlobalStyles.spacingVertN(-2),
-        //justifyContent: "space-between",
+        padding: 4,
+        rowGap: 4,
+        justifyContent: "space-between",
         alignItems: "center",
         position: "relative"
     },
@@ -362,8 +358,8 @@ const styles =
     {
         width: "10%",
         padding: utilsGlobalStyles.spacingVertN(-2),
-        rowGap: utilsGlobalStyles.spacingVertN(-2),
-        justifyContent: "space-around",
+        rowGap: utilsGlobalStyles.spacingVertN(-1),
+        justifyContent: "center",
         alignItems: "center"
     },
     conNextBlocks:
@@ -376,7 +372,7 @@ const styles =
         rowGap: utilsGlobalStyles.spacingVertN(-2),
         alignItems: "center"
     },
-    conLeftmost:
+    conRightMost:
     {
         borderRightWidth: 0
     },
@@ -384,7 +380,7 @@ const styles =
     {
         padding: 7,
         borderRadius: globalProps.borderRadiusStandard,
-        width: "fit-content"
+        width: "fit-content",
         //border: "1px solid"
     },
     btnMenuControl:
