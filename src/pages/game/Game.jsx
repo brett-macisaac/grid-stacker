@@ -33,7 +33,7 @@ function Game()
     // Acquire window size.
     const windowSize = useContext(WindowSizeContext);
 
-    // The user's preferences and the function that handles updating it.
+    // The user's preferences.
     const { prefs } = useContext(PreferenceContext);
 
     // An object that tracks how much of each tally has been updated.
@@ -46,7 +46,8 @@ function Game()
             { }
         )
     );
-    const nextBlocks = useRef(
+
+    const rfNextBlocks = useRef(
         [ ...Array(4) ].map(
             () =>
             {
@@ -56,7 +57,7 @@ function Game()
         )
     );
 
-    const heldBlock = useRef(undefined);
+    const rfHeldBlock = useRef(undefined);
 
     const [ updater, setUpdater ] = useState(false);
     
@@ -94,10 +95,6 @@ function Game()
     useEffect(
         () =>
         {
-            // Initialise the grid.
-            //rfGrid.current = new Grid(location.state.cols, location.state.rows);
-            //reRender();
-
             const lHighScores = utils.GetFromLocalStorage(consts.lclStrgKeyHighScores);
 
             const lKeyGridSize = utilsAppSpecific.getGridSizeKey(location.state.cols, location.state.rows);
@@ -152,12 +149,6 @@ function Game()
         []
     );
 
-    // const updateGridState = () =>
-    // {
-    //     //setGrid(prev => { return { ...prev } });
-    //     setGrid({ instance: rfGrid.current });
-    // }
-
     const handlePlay = async () =>
     {
         if (!areMenuButtonsEnabled.current)
@@ -167,15 +158,7 @@ function Game()
         rfGameInProgress.current = true;
 
         // Reset the game's state.
-        //rfGrid.current.Reset(); reRender();
-        rfGrid.current.Reset();
-        resetScoreAndLines(0, 0);
-        resetTallies();
-        resetNextBlocks();
-        heldBlock.current = undefined;
-        reRender();
-
-        console.log(rfGrid.current);
+        resetGame();
 
         // The current period that defines the block's fall rate.
         let lFallPeriodCurrent = gFallPeriodMax;
@@ -202,13 +185,14 @@ function Game()
             if (moveBlock(Vector2D.s_up, true))
             { continue; }
 
+            // Disable user's ability to move the block.
             rfBlock.current = undefined;
 
             // Reset the gSoftDrop flag.
             gSoftDrop = false;
 
-            // Remove full lines and record the number of them.
-            const lNumFullLines = await removeFullLines();
+            const lNumFullLines = (rfGrid.current).GetNumFullLines();
+            const lIsPerfectClear = rfGrid.current.IsEmptyAfterClear();
 
             // If the user cleared at least one line.
             if (lNumFullLines !== 0)
@@ -221,13 +205,42 @@ function Game()
                 
                 // If all rows have been cleared (i.e. the grid is empty) double the line clears score.
                 // If all rows have been cleared, this is known as a 'perfect clear'.
-                if (rfGrid.current.IsEmpty())
+                if (lIsPerfectClear)
                 { 
-                    console.log("Perfect clear!");
-                    lScoreFromLineClears *= 2;
+                    gStreakStats.perfectClearStreak += 1;
+
+                    console.log(`Perfect clear streak of ${gStreakStats.perfectClearStreak}.`);
+
+                    lScoreFromLineClears *= gStreakStats.perfectClearStreak;
+                }
+                else
+                {
+                    gStreakStats.perfectClearStreak = 0;
+                }
+
+                // Factor in streaks.
+                if (lNumFullLines == gStreakStats.lineClearStreakNum)
+                {
+                    gStreakStats.lineClearStreakCount += 1;
+                    console.log(`Streak of ${lNumFullLines} lines: ${gStreakStats.lineClearStreakCount}`);
+
+                    lScoreFromLineClears *= gStreakStats.lineClearStreakCount;
+                }
+                else if (lNumFullLines != 1) // You can't get a streak on 1.
+                {
+                    gStreakStats.lineClearStreakNum = lNumFullLines;
+                    gStreakStats.lineClearStreakCount = 1;
                 }
 
                 console.log(`Score from ${lNumFullLines} lines: ${lScoreFromLineClears}`);
+
+                rfGrid.current.text = `+${lScoreFromLineClears}`;
+
+                // Remove full lines.
+                await removeFullLines();
+
+                rfGrid.current.text = "";
+
                 // Increment the score and lines.
                 addScoreAndLines(lScoreFromLineClears, lNumFullLines);
 
@@ -278,6 +291,9 @@ function Game()
 
         rfGameInProgress.current = false;
 
+        // Disable user's ability to move the block.
+        rfBlock.current = undefined;
+
         // Disable the menu buttons temporarily so that the user doesn't accidentally click it.
         disableMenuButtonsTemporarily();
 
@@ -301,15 +317,18 @@ function Game()
          > The number of full rows that were cleared. 
     */
     const removeFullLines = async () => //throws InterruptedException
-    {   
+    {
+        // The dimensions of the grid.
+        const lGridDimensions = rfGrid.current.dimension;
+
+        // The time taken to clear 1 line.
+        const lPausePerLine = 250
+
         // The time to pause between individual tiles being shifted down (ms).
-        const lLengthPause = 25;
+        const lPausePerTile = lPausePerLine / lGridDimensions.columns;
 
         // The number of full rows found thus far.
         let lNumFullRows = 0;
-
-        // The dimensions of the grid.
-        const lGridDimensions = rfGrid.current.dimension;
 
         for (let row = lGridDimensions.rows - 1; row >= 0; --row)
         {   
@@ -349,13 +368,13 @@ function Game()
                     rfGrid.current.EmptyTile(col, row);
                     reRender();
 
-                    await utils.SleepFor(lLengthPause);
+                    await utils.SleepFor(lPausePerTile);
                 }
             }
-            else if (lIsRowEmpty) // If the row is empty, this means that all rows above it are also empty.
-            {
-                break;
-            }
+            // else if (lIsRowEmpty) // If the row is empty, this means that all rows above it are also empty.
+            // {
+            //     break;
+            // }
             else if (lNumFullRows !== 0) // && !lIsRowFull && !lIsRowEmpty (if the row isn't full and isn't empty: i.e. semi-filled).
             {
                 // Shift the (non-full, non-empty) row down lNumFullRows rows.
@@ -372,7 +391,7 @@ function Game()
 
                     reRender();
 
-                    await utils.SleepFor(lLengthPause);
+                    await utils.SleepFor(lPausePerTile);
                 }
                 
             }
@@ -386,10 +405,7 @@ function Game()
     const moveBlock = (pMovement) =>
     {
         if (!(rfBlock.current instanceof Block))
-        {
-            console.log("The block cannot be moved, as it doesn't exist.");
-            return false;
-        }
+        { return false; }
 
         let lDidMove = rfBlock.current.Move(pMovement, rfGrid.current, true);
         reRender();
@@ -406,10 +422,7 @@ function Game()
     const rotateBlock = (pClockwise) =>
     {
         if (!(rfBlock.current instanceof Block))
-        {
-            console.log("The block cannot be rotated, as it doesn't exist.");
-            return false;
-        }
+        { return false; }
 
         let lDidRotate = rfBlock.current.Rotate(pClockwise, rfGrid.current, true);
         reRender();
@@ -423,10 +436,7 @@ function Game()
     const rotateBlock180 = () =>
     {
         if (!(rfBlock.current instanceof Block))
-        {
-            console.log("The block cannot be rotated, as it doesn't exist.");
-            return false;
-        }
+        { return false; }
 
         let lDidRotate = rfBlock.current.Rotate180(rfGrid.current);
         reRender();
@@ -439,12 +449,22 @@ function Game()
     */
     const rotateNextBlock = (pClockwise) =>
     {
-        if (!rfGameInProgress.current)
+        const lNextBlock = rfNextBlocks.current[rfNextBlocks.current.length - 1];
+
+        if (!rfGameInProgress.current || !(lNextBlock instanceof Block))
         { return; }
 
-        const lNextBlock = nextBlocks.current[nextBlocks.current.length - 1];
-
         lNextBlock.changeRotationIndex(pClockwise);
+
+        reRender();
+    }
+
+    const rotateHeldBlock = (pClockwise) =>
+    {
+        if (!rfGameInProgress.current || !(rfHeldBlock.current instanceof Block))
+        { return; }
+
+        rfHeldBlock.current.changeRotationIndex(pClockwise);
 
         reRender();
     }
@@ -454,10 +474,10 @@ function Game()
     */
     const rotateNextBlock180 = () =>
     {
-        if (!rfGameInProgress.current)
-        { return; }
+        const lNextBlock = rfNextBlocks.current[rfNextBlocks.current.length - 1];
 
-        const lNextBlock = nextBlocks.current[nextBlocks.current.length - 1];
+        if (!rfGameInProgress.current || !(lNextBlock instanceof Block))
+        { return; }
 
         // Rotate block 180 degrees (i.e. rotate twice in any direction).
         lNextBlock.changeRotationIndex(true); lNextBlock.changeRotationIndex(true);
@@ -465,8 +485,25 @@ function Game()
         reRender();
     }
 
+    /*
+    * Rotate the held block 180 degrees.
+    */
+    const rotateHeldBlock180 = () =>
+    {
+        if (!rfGameInProgress.current || !(rfHeldBlock.current instanceof Block))
+        { return; }
+
+        // Rotate block 180 degrees (i.e. rotate twice in any direction).
+        rfHeldBlock.current.changeRotationIndex(true); rfHeldBlock.current.changeRotationIndex(true);
+
+        reRender();
+    }
+
     const shiftBlock = (pDirection) =>
     {
+        if (!(rfBlock.current instanceof Block))
+        { return; }
+
         rfBlock.current.Shift(rfGrid.current, pDirection, false);
         reRender();
     };
@@ -476,11 +513,9 @@ function Game()
         // If rfBlock has already been set (e.g. from the player 'holding' a block), do not spawn a new block in.
         // i.e. a block should only be spawned if it's undefined.
         if (rfBlock.current)
-        {
-            return;
-        }
+        { return; }
 
-        rfBlock.current = nextBlocks.current[nextBlocks.current.length - 1].copy();
+        rfBlock.current = rfNextBlocks.current[rfNextBlocks.current.length - 1].copy();
         isBlockThePrevHeldBlock.current = false;
 
         //let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
@@ -489,9 +524,9 @@ function Game()
 
         const lBlocks = location.state.blocks.split('');
 
-        nextBlocks.current = [ 
+        rfNextBlocks.current = [ 
             new Block(lBlocks[utils.GetRandom(0, lBlocks.length - 1)]),
-            ...(nextBlocks.current.slice(0, nextBlocks.current.length - 1))
+            ...(rfNextBlocks.current.slice(0, rfNextBlocks.current.length - 1))
         ];
 
         if (lCanSpawn)
@@ -505,10 +540,7 @@ function Game()
     const holdBlock = () =>
     {
         if (!(rfBlock.current instanceof Block))
-        {
-            console.log("The block cannot be held, as it doesn't exist.");
-            return false;
-        }
+        { return; }
 
         // If the current block was the block held previously, return.
         if (isBlockThePrevHeldBlock.current)
@@ -516,9 +548,9 @@ function Game()
 
         rfGrid.current.UnDrawBlock(rfBlock.current);
 
-        if (!heldBlock.current)
+        if (!rfHeldBlock.current)
         {
-            heldBlock.current = rfBlock.current.copy();
+            rfHeldBlock.current = rfBlock.current.copy();
 
             rfBlock.current = undefined;
 
@@ -528,10 +560,10 @@ function Game()
         {
             const lBlockCurrent = rfBlock.current.copy();
 
-            rfBlock.current = heldBlock.current;
+            rfBlock.current = rfHeldBlock.current;
             isBlockThePrevHeldBlock.current = true;
 
-            heldBlock.current = lBlockCurrent;
+            rfHeldBlock.current = lBlockCurrent;
 
             // let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
             // reRender();
@@ -689,12 +721,27 @@ function Game()
     {
         const lBlocks = location.state.blocks.split('');
 
-        nextBlocks.current = [ ...Array(4) ].map(
+        rfNextBlocks.current = [ ...Array(4) ].map(
             () =>
             {
                 return new Block(lBlocks[utils.GetRandom(0, lBlocks.length - 1)]);
             }
         );
+    };
+
+    const resetGame = () =>
+    {
+        rfGrid.current.Reset();
+        resetScoreAndLines(0, 0);
+        resetTallies();
+        resetNextBlocks();
+        rfHeldBlock.current = undefined;
+        reRender();
+
+        for (const key in gStreakStats)
+        {
+            gStreakStats[key] = 0;
+        }
     };
 
     /*
@@ -721,6 +768,8 @@ function Game()
 
     const handleKeyDown = (pEvent) =>
     {
+        pEvent.stopPropagation();
+        
         if (!rfBlock.current || !rfGameInProgress.current)
         { return; }
 
@@ -729,6 +778,9 @@ function Game()
 
         // Whether the shift key is down.
         const lIsShiftDown = pEvent.shiftKey;
+
+        // Whether the alt key is down.
+        const lIsAltDown = pEvent.altKey;
 
         // Translational Movement.
         if (lKey === "ArrowDown")
@@ -759,6 +811,8 @@ function Game()
         {
             if (lIsShiftDown)
                 rotateNextBlock(true)
+            else if (lIsAltDown)
+                rotateHeldBlock(true)
             else
                 rotateBlock(true);
         }
@@ -766,6 +820,8 @@ function Game()
         {
             if (lIsShiftDown)
                 rotateNextBlock(false)
+            else if (lIsAltDown)
+                rotateHeldBlock(false)
             else
                 rotateBlock(false);
         }
@@ -773,6 +829,8 @@ function Game()
         {
             if (lIsShiftDown)
                 rotateNextBlock180()
+            else if (lIsAltDown)
+                rotateHeldBlock180()
             else
                 rotateBlock180();
         }
@@ -798,23 +856,23 @@ function Game()
         rightMax: () => shiftBlock(Vector2D.s_right),
         rotate180: rotateBlock180,
         rotateNextBlock: () => rotateNextBlock(true),
+        rotateHeldBlock: () => rotateHeldBlock(true),
         hold: holdBlock,
     };
 
     const lGridHold = new Grid(4, 4);
-    if (heldBlock.current)
+    if (rfHeldBlock.current)
     {
-        lGridHold.DrawBlockAt(heldBlock.current, Grid.DrawPosition.CentreMid, false);
+        lGridHold.DrawBlockAt(rfHeldBlock.current, Grid.DrawPosition.CentreMid, false);
     }
 
     if (isLandscape())
     {
         return (
             <GameLandscape 
-                //prGrid = { grid }
                 prGrid = { rfGrid.current }
                 prBlockTallies = { blockTallies }
-                prNextBlocks = { nextBlocks.current }
+                prNextBlocks = { rfNextBlocks.current }
                 prGridHold = { lGridHold }
                 prGameInProgress = { rfGameInProgress.current }
                 prActiveBlocks = { location.state.blocks }
@@ -829,10 +887,9 @@ function Game()
     {
         return (
             <GamePortrait 
-                //prGrid = { grid }
                 prGrid = { rfGrid.current }
                 prBlockTallies = { blockTallies }
-                prNextBlocks = { nextBlocks.current }
+                prNextBlocks = { rfNextBlocks.current }
                 prGridHold = { lGridHold }
                 prGameInProgress = { rfGameInProgress.current }
                 prActiveBlocks = { location.state.blocks }
@@ -848,19 +905,18 @@ function Game()
 /*
 * The slowest/highest period at which the block falls (ms).
 */
-const gFallPeriodMax = 700;
+const gFallPeriodMax = 900;
 
 /*
 * The fastest/lowest period at which the block falls (ms).
 */
-const gFallPeriodMin = 200;
+const gFallPeriodMin = 300;
 
 /*
 * The interval between consecutive block fall period (ms): e.g. the fall rate at level 4 will be 
   s_fall_rate_interval ms lower than at level 3.
 * The difference between the max and min fall periods must be divisible by this value: i.e. 
   (s_fall_period_initial - s_fall_period_min) % s_fall_period_interval == 0 must be true.
-    
 */
 const gFallPeriodInterval = 100;
 
@@ -887,6 +943,27 @@ const gLengthLevel = 4;
   executed a 'perfect clear' whereby the grid is completely empty, this value is doubled.
 */
 const gScoresLineClears = [ 40, 100, 300, 1200 ];
+
+/*
+* The user's 'streaks' stats. A 'streak' is when the user does something a number of times in succession. For instance,
+  if the user executes a perfect clear 3 times in-a-row, this is a streak, which they are rewarded for.
+*/
+const gStreakStats = 
+{
+    /*
+    * The number of perfect clears the user has made in-a-row. The user's score is multiplied by whatever this number
+      is.
+    */
+    perfectClearStreak: 0,
+
+    /*
+    * These numbers determine the user's line-clear streak. lineClearStreakNum refers to the number of lines the user
+      has cleared each time in the streak, while lineClearStreakCount is the number of line clears made. e.g. if the 
+      user clears 2 lines 3 times in a row, lineClearStreakNum is the 2, and lineClearStreakCount is the 3.
+    */
+    lineClearStreakNum: 0,
+    lineClearStreakCount: 0
+};
 
 // A flag that, when true, indicates that the block should be 'soft dropped'.
 let gSoftDrop = false;

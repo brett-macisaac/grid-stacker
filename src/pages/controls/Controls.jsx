@@ -47,8 +47,7 @@ function Controls()
                                     prTitle = { pCtrlDesc.title }
                                     prDescription = { pCtrlDesc.description } 
                                     prScreenControl = { pCtrlDesc.screenControl }
-                                    prIsScreenControlSquare = { pCtrlDesc.isScreenControlSquare }
-                                    prKey = { pCtrlDesc.key } prIsShiftControl = { pCtrlDesc.isShift }
+                                    prKeys = { pCtrlDesc.keys }
                                 />
                             );
                         }
@@ -112,89 +111,85 @@ const gControlDescriptions =
             title: "LEFT",
             description: "Moves the block 1 space to the left.",
             screenControl: gridSymbols.left,
-            isScreenControlSquare: true,
-            key: imgsKeys.arrowLeft,
-            isShift: false
+            keys: [ imgsKeys.arrowLeft ],
         },
         {
             title: "RIGHT",
             description: "Moves the block 1 space to the right.",
             screenControl: gridSymbols.right,
-            isScreenControlSquare: true,
-            key: imgsKeys.arrowRight,
-            isShift: false
+            keys: [ imgsKeys.arrowRight ],
         },
         {
             title: "CLOCKWISE",
             description: "Rotates the block 90 degrees clockwise.",
             screenControl: gridSymbols.clockwise,
-            isScreenControlSquare: true,
-            key: imgsKeys.d,
-            isShift: false
+            keys: [ imgsKeys.d ],
         },
         {
             title: "ANTI-CLOCKWISE",
             description: "Rotates the block 90 degrees anti-clockwise.",
             screenControl: gridSymbols.anticlockwise,
-            isScreenControlSquare: true,
-            key: imgsKeys.a,
-            isShift: false
+            keys: [ imgsKeys.a ],
         },
         {
             title: "180",
             description: "Rotates the block 180 degrees.",
             screenControl: gridSymbols.rotate180,
-            isScreenControlSquare: true,
-            key: imgsKeys.s,
-            isShift: false
+            keys: [ imgsKeys.s ],
         },
         {
             title: "DOWN (Soft Drop)",
             description: "Increases the speed of the falling block. Press again to return to the normal speed.",
             screenControl: gridSymbols.down,
-            isScreenControlSquare: true,
-            key: imgsKeys.arrowDown,
-            isShift: false
+            keys: [ imgsKeys.arrowDown ],
         },
         {
             title: "DOWN MAX (Hard Drop)",
             description: "Instantly moves the block as far down as it can go.",
             screenControl: gridSymbols.downMax,
-            isScreenControlSquare: true,
-            key: imgsKeys.arrowUp,
-            isShift: false
+            keys: [ imgsKeys.arrowUp ],
         },
         {
             title: "HOLD",
             description: "Removes the block that is currently falling and replaces it with the block in the 'hold' grid. If there isn't a block in the hold grid, the next block spawns in.",
             screenControl: gridSymbols.hold,
-            isScreenControlSquare: false,
-            key: imgsKeys.space,
-            isShift: false
+            keys: [ imgsKeys.space ],
         },
         {
             title: "CLOCKWISE NEXT",
             description: "Rotates the next block 90 degrees clockwise.",
             screenControl: "Press the grid on which the next block is displayed.",
-            isScreenControlSquare: true,
-            key: imgsKeys.d,
-            isShift: true
+            keys: [ imgsKeys.shift, imgsKeys.d ],
         },
         {
             title: "ANTI-CLOCKWISE NEXT",
             description: "Rotates the next block 90 degrees anti-clockwise.",
             screenControl: "Unavailable",
-            isScreenControlSquare: true,
-            key: imgsKeys.a,
-            isShift: true
+            keys: [ imgsKeys.shift, imgsKeys.a ],
         },
         {
             title: "180 NEXT",
             description: "Rotates the next block 180 degrees",
             screenControl: "Unavailable",
-            isScreenControlSquare: true,
-            key: imgsKeys.s,
-            isShift: true
+            keys: [ imgsKeys.shift, imgsKeys.s ],
+        },
+        {
+            title: "CLOCKWISE HELD",
+            description: "Rotates the held block 90 degrees clockwise.",
+            screenControl: "Press the grid on which the held block is displayed.",
+            keys: [ imgsKeys.alt, imgsKeys.d ],
+        },
+        {
+            title: "ANTI-CLOCKWISE HELD",
+            description: "Rotates the held block 90 degrees anti-clockwise.",
+            screenControl: "Unavailable",
+            keys: [ imgsKeys.alt, imgsKeys.a ],
+        },
+        {
+            title: "180 HELD",
+            description: "Rotates the held block 180 degrees",
+            screenControl: "Unavailable",
+            keys: [ imgsKeys.alt, imgsKeys.s],
         },
     ];
 

@@ -149,6 +149,7 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
                         <TextStandard text = "HOLD" isBold style = {{ textAlign: "center" }} />
                         <GridDisplayer 
                             prGrid = { prGridHold } 
+                            prOnClick = { prHandlers.rotateHeldBlock }
                             prMaxHeight = { gMaxHeightTallyGrid } 
                             prMaxWidth = { gMaxWidthTallyGrid } 
                         />
@@ -377,8 +378,8 @@ const styles =
     conGameControls:
     {
         height: "100%",
-        padding: 4, //utilsGlobalStyles.spacingVertN(-2),
-        rowGap: 4,
+        padding: 6, //utilsGlobalStyles.spacingVertN(-2),
+        rowGap: 6,
         justifyContent: "space-between",
         alignItems: "center"
     },
@@ -386,7 +387,7 @@ const styles =
     {
         height: "50%",
         flexDirection: "row",
-        columnGap: 4, //utilsGlobalStyles.spacingVertN(-1),
+        columnGap: 6, //utilsGlobalStyles.spacingVertN(-1),
         alignItems: "center"
     },
     btnGameControl:

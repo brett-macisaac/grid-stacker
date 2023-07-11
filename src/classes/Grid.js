@@ -195,6 +195,84 @@ class Grid
         return true;
     }
 
+    GetNumFullLines()
+    {
+        // The number of full rows found thus far.
+        let lNumFullRows = 0;
+
+        for (let row = this.#fNumRows - 1; row >= 0; --row)
+        {   
+            let lIsRowFull = true;
+            let lIsRowEmpty = true;
+            
+            for (let col = 0; col < this.#fNumColumns; ++col)
+            {
+                if (!lIsRowFull && !lIsRowEmpty) // If both booleans have been falsified.
+                {
+                    break;
+                }
+                else if (this.IsTileEmpty(col, row))
+                {
+                    // If at least one tile is empty, the row can't be full.
+                    lIsRowFull = false;
+                }
+                else // if (!this.IsTileEmpty(col, row))
+                {
+                    // If at least one tile is filled, the row can't be empty.
+                    lIsRowEmpty = false;
+                }
+            }
+            
+            if (lIsRowFull) 
+            { 
+                // Record occurrence of full row.
+                ++lNumFullRows;
+            }
+            // else if (lIsRowEmpty) // If the row is empty, this means that all rows above it are also empty.
+            // {
+            //     break;
+            // }
+        }
+        
+        // Return the number of full rows.
+        return lNumFullRows;
+    }
+
+    /*
+    * Returns whether the grid would be empty after clearing.
+    */
+    IsEmptyAfterClear()
+    {
+        if (this.IsEmpty())
+            return true;
+
+        for (let row = this.#fNumRows - 1; row >= 0; --row)
+        {   
+            let lIsRowFull = true;
+            let lIsRowEmpty = true;
+            
+            for (let col = 0; col < this.#fNumColumns; ++col)
+            {
+                if (!lIsRowFull && !lIsRowEmpty) // If both booleans have been falsified.
+                {
+                    return false;
+                }
+                else if (this.IsTileEmpty(col, row))
+                {
+                    // If at least one tile is empty, the row can't be full.
+                    lIsRowFull = false;
+                }
+                else // if (!this.IsTileEmpty(col, row))
+                {
+                    // If at least one tile is filled, the row can't be empty.
+                    lIsRowEmpty = false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     /*
      * This method returns true if the given position/coordinate is both valid (within valid bounds) and empty; false if
        otherwise.
@@ -268,8 +346,15 @@ class Grid
         }
         
         aBlock.position = lSpawnLocation;
-        
-        return this.DrawBlock(aBlock, aDrawShadow);
+
+        if (this.DrawBlock(aBlock, aDrawShadow))
+        {
+            return true;
+        }
+        else if (aDrawPosition !== Grid.DrawPosition.TopTwoRows)
+        {
+            return this.DrawBlockAt(aBlock, Grid.DrawPosition.TopTwoRows, aDrawShadow);
+        }
     }
     
     /*

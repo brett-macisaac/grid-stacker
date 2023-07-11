@@ -11,7 +11,7 @@ import TextStandard from '../../components/text_standard/TextStandard';
 import globalProps, { utilsGlobalStyles } from '../../styles';
 
 
-function ControlDescription({ prTitle, prDescription, prScreenControl, prIsScreenControlSquare, prKey, prIsShiftControl })
+function ControlDescription({ prTitle, prDescription, prScreenControl, prIsScreenControlSquare, prKeys, prIsShiftControl, prCtrlKey })
 {
     //Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -86,21 +86,28 @@ function ControlDescription({ prTitle, prDescription, prScreenControl, prIsScree
 
                     <div style = { styles.conControlInner }>
                         {
-                            prIsShiftControl && (
-                                <div style = { styles.conShift }>
-                                    <img src = { imgsKeys.shift } alt = "keyShift" style = { styles.imgKeyRect } />
-                                    <TextStandard 
-                                        text = { "+" }
-                                        isBold size = { 1 }
-                                        style = {{ 
-                                            ...styles.text
-                                        }}
-                                    />
-                                </div>
+                            prKeys.map(
+                                (pKey, pIndex) =>
+                                {
+                                    return (
+                                        <div key = { pIndex } style = { styles.conKey }>
+                                            <img src = { pKey } alt = "key" style = { styles.imgKey } />
+                                            {
+                                                (pIndex != prKeys.length - 1) && (
+                                                    <TextStandard 
+                                                        text = { "+" }
+                                                        isBold size = { 2 }
+                                                        style = {{ 
+                                                            ...styles.text
+                                                        }}
+                                                    />
+                                                )
+                                            }
+                                        </div>
+                                    )
+                                }
                             )
                         }
-
-                        <img src = { prKey } alt = "key" style = { prIsScreenControlSquare ? styles.imgKeySquare : styles.imgKeyRect } />
                     </div>
 
                 </div>
@@ -119,15 +126,11 @@ ControlDescription.propTypes =
         PropTypes.instanceOf(GridSymbol).isRequired,
         PropTypes.string.isRequired
     ]),
-    prIsScreenControlSquare: PropTypes.bool,
-    prKey: PropTypes.string.isRequired,
-    prIsShiftControl: PropTypes.bool
+    prKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 ControlDescription.defaultProps =
 {
-    prIsScreenControlSquare: false,
-    prIsShiftControl: false,
 };
 
 const styles = 
@@ -157,7 +160,8 @@ const styles =
         width: "100%", height: "100%",
         justifyContent: "center",
         alignItems: "center",
-        paddingLeft: 8, paddingRight: 8
+        paddingLeft: 8, paddingRight: 8,
+        rowGap: utilsGlobalStyles.spacingVertN(-2),
     },
     conControlScreen:
     {
@@ -181,6 +185,10 @@ const styles =
         borderRadius: globalProps.borderRadiusStandard,
         //border: "1px solid"
     },
+    imgKey:
+    {
+        maxWidth: "100%", maxHeight: "100%"
+    },
     imgKeySquare:
     {
         width: 60,
@@ -191,9 +199,9 @@ const styles =
         width: 120,
         height: 50
     },
-    conShift:
+    conKey:
     {
-        marginBottom: utilsGlobalStyles.spacingVertN(-3),
+        //marginBottom: utilsGlobalStyles.spacingVertN(-3),
         rowGap: utilsGlobalStyles.spacingVertN(-3)
     }
 };

@@ -37,40 +37,40 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
     const [ optionsPopUpMsg, setOptionsPopUpMsg ] = useState(undefined);
 
     // The width of the containers' (right) border.
-    const gWidthBorder = parseInt(styles.con.borderRight);
+    const lWidthBorder = parseInt(styles.con.borderRight);
 
     // The width of the control containers.
-    const gWidthConControls = utils.GetPercentVal(styles.conControls.width, window.innerWidth);
+    const lWidthConControls = utils.GetPercentVal(styles.conControls.width, window.innerWidth);
 
     // The maximum dimension of the game buttons.
-    const gMaxWidthGameButton = Math.floor(gWidthConControls - 2 * styles.conControls.padding - gWidthBorder);
-    const gMaxHeightGameButton = Math.floor((window.innerHeight - 2 * styles.conControls.padding - 4 * styles.conControls.rowGap) / 5);
-    const gMaxSizeGameButton = Math.min(gMaxWidthGameButton, gMaxHeightGameButton);
-    let gMaxSizeGameButtonSymbol = gMaxSizeGameButton - 2 * styles.btnGameControl.padding;
-    gMaxSizeGameButtonSymbol = gMaxSizeGameButtonSymbol > 100 ? 100 : gMaxSizeGameButtonSymbol;
+    const lMaxWidthGameButton = Math.floor(lWidthConControls - 2 * styles.conControls.padding - lWidthBorder);
+    const lMaxHeightGameButton = Math.floor((window.innerHeight - 2 * styles.conControls.padding - 4 * styles.conControls.rowGap) / 5);
+    const lMaxSizeGameButton = Math.min(lMaxWidthGameButton, lMaxHeightGameButton);
+    let lMaxSizeGameButtonSymbol = lMaxSizeGameButton - 2 * styles.btnGameControl.padding;
+    lMaxSizeGameButtonSymbol = lMaxSizeGameButtonSymbol > 100 ? 100 : lMaxSizeGameButtonSymbol;
 
     // The maximum dimensions of the game grid.
-    const gMaxHeightGameGrid = Math.floor(window.innerHeight);
-    const gMaxWidthGameGrid = Math.floor(utils.GetPercentVal(styles.conGrid.width, window.innerWidth));
+    const lMaxHeightGameGrid = Math.floor(window.innerHeight);
+    const lMaxWidthGameGrid = Math.floor(utils.GetPercentVal(styles.conGrid.width, window.innerWidth));
 
     // The dimensions of the tally container.
-    const gHeightConTally = window.innerHeight - gHeightStatsTable;
-    const gWidthConTally = utils.GetPercentVal(styles.conStats.width, window.innerWidth);
+    const lHeightConTally = window.innerHeight - gHeightStatsTable;
+    const lWidthConTally = utils.GetPercentVal(styles.conStats.width, window.innerWidth);
 
     // The maximum dimensions of the grids displayed in the tally container (such that there's two columns).
-    let gMaxHeightTallyGrid = Math.floor((gHeightConTally - 4 * styles.conTallySub.rowGap - utilsGlobalStyles.fontSizeN() - 2 * styles.conTally.padding) / 4);
-    let gMaxWidthTallyGrid = Math.floor((gWidthConTally - styles.conTallySub.columnGap - 2 * styles.conTally.padding -  gWidthBorder) / 2);
-    gMaxHeightTallyGrid = gMaxHeightTallyGrid > 100 ? 100 : gMaxHeightTallyGrid;
-    gMaxWidthTallyGrid = gMaxWidthTallyGrid > 100 ? 100 : gMaxWidthTallyGrid;
+    let lMaxHeightTallyGrid = Math.floor((lHeightConTally - 4 * styles.conTallySub.rowGap - utilsGlobalStyles.fontSizeN() - 2 * styles.conTally.padding) / 4);
+    let lMaxWidthTallyGrid = Math.floor((lWidthConTally - styles.conTallySub.columnGap - 2 * styles.conTally.padding -  lWidthBorder) / 2);
+    lMaxHeightTallyGrid = lMaxHeightTallyGrid > 100 ? 100 : lMaxHeightTallyGrid;
+    lMaxWidthTallyGrid = lMaxWidthTallyGrid > 100 ? 100 : lMaxWidthTallyGrid;
 
     // The maximum dimensions of the grids displayed in the 'next blocks' container.
-    let gMaxHeightNextGrids = Math.floor(
+    let lMaxHeightNextGrids = Math.floor(
         (window.innerHeight - styles.conHoldBlock.rowGap - 4 * styles.conNextBlocks.rowGap - 
          2 * utilsGlobalStyles.fontSizeN() - 2 * styles.conBlocks.padding - styles.conBlocks.rowGap) / 5
     );
-    let gMaxWidthNextGrids = Math.floor(utils.GetPercentVal(styles.conBlocks.width, window.innerWidth) - 2 * styles.conBlocks.padding);
-    gMaxHeightNextGrids = gMaxHeightNextGrids > 100 ? 100 : gMaxHeightNextGrids;
-    gMaxWidthNextGrids = gMaxWidthNextGrids > 100 ? 100 : gMaxWidthNextGrids;
+    let lMaxWidthNextGrids = Math.floor(utils.GetPercentVal(styles.conBlocks.width, window.innerWidth) - 2 * styles.conBlocks.padding);
+    lMaxHeightNextGrids = lMaxHeightNextGrids > 100 ? 100 : lMaxHeightNextGrids;
+    lMaxWidthNextGrids = lMaxWidthNextGrids > 100 ? 100 : lMaxWidthNextGrids;
 
     // The 'left' game buttons.
     const lGameButtonSymbolsLeft = [
@@ -125,14 +125,14 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                                     key = { pIndex }
                                     style = {{ 
                                         ...styles.btnGameControl, border: `1px solid ${pSymbol.colour}`,
-                                        width: gMaxWidthGameButton, height: gMaxHeightGameButton
+                                        width: lMaxWidthGameButton, height: lMaxHeightGameButton
                                     }}
                                     onPress = { lOnPress } isOnDown
                                 >
                                     <GridDisplayer 
                                         prGrid = { pSymbol.grid } 
-                                        prMaxHeight = { gMaxSizeGameButtonSymbol }
-                                        prMaxWidth = { gMaxSizeGameButtonSymbol }
+                                        prMaxHeight = { lMaxSizeGameButtonSymbol }
+                                        prMaxWidth = { lMaxSizeGameButtonSymbol }
                                         prColourBackground = { theme.buttonContent }
                                     />
                                 </ButtonStandard>
@@ -167,8 +167,8 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                                         <GridDisplayer 
                                             key = { pIndex }
                                             prGrid = { lGrid } 
-                                            prMaxHeight = { gMaxHeightTallyGrid } 
-                                            prMaxWidth = { gMaxWidthTallyGrid } 
+                                            prMaxHeight = { lMaxHeightTallyGrid } 
+                                            prMaxWidth = { lMaxWidthTallyGrid } 
                                         />
                                     );
                                 }
@@ -188,8 +188,8 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                     prGrid && (
                         <GridDisplayer 
                             prGrid = { prGrid } 
-                            prMaxWidth = { gMaxWidthGameGrid } 
-                            prMaxHeight = { gMaxHeightGameGrid } 
+                            prMaxWidth = { lMaxWidthGameGrid } 
+                            prMaxHeight = { lMaxHeightGameGrid } 
                         />
                     )
                 }
@@ -200,8 +200,9 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                     <TextStandard text = "HOLD" isBold style = {{ textAlign: "center" }} />
                     <GridDisplayer 
                         prGrid = { prGridHold } 
-                        prMaxHeight = { gMaxHeightNextGrids } 
-                        prMaxWidth = { gMaxWidthNextGrids } 
+                        prOnClick = { prHandlers.rotateHeldBlock }
+                        prMaxHeight = { lMaxHeightNextGrids } 
+                        prMaxWidth = { lMaxWidthNextGrids } 
                     />
                 </div>
 
@@ -221,8 +222,8 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                                     <GridDisplayer 
                                         key = { pIndex }
                                         prGrid = { lGrid } 
-                                        prMaxHeight = { gMaxHeightNextGrids } 
-                                        prMaxWidth = { gMaxWidthNextGrids } 
+                                        prMaxHeight = { lMaxHeightNextGrids } 
+                                        prMaxWidth = { lMaxWidthNextGrids } 
                                         prColourBorder = { pIndex == prNextBlocks.length - 1 ? theme.selected : undefined }
                                         prOnClick = { lOnClick }
                                     />
@@ -264,14 +265,14 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                                     key = { pIndex }
                                     style = {{ 
                                         ...styles.btnGameControl, border: `1px solid ${pSymbol.colour}`, 
-                                        width: gMaxWidthGameButton, height: gMaxHeightGameButton
+                                        width: lMaxWidthGameButton, height: lMaxHeightGameButton
                                     }}
                                     onPress = { lOnPress } isOnDown
                                 >
                                     <GridDisplayer 
                                         prGrid = { pSymbol.grid } 
-                                        prMaxHeight = { gMaxSizeGameButtonSymbol }
-                                        prMaxWidth = { gMaxSizeGameButtonSymbol }
+                                        prMaxHeight = { lMaxSizeGameButtonSymbol }
+                                        prMaxWidth = { lMaxSizeGameButtonSymbol }
                                         prColourBackground = { theme.buttonContent }
                                     />
                                 </ButtonStandard>
@@ -322,8 +323,8 @@ const styles =
     {
         //backgroundColor: "#0A0AA1",
         width: "15%",
-        padding: 4,
-        rowGap: 4,
+        padding: 6,
+        rowGap: 6,
         justifyContent: "space-between",
         alignItems: "center",
         position: "relative"
