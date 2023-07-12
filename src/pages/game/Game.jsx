@@ -59,7 +59,7 @@ function Game()
 
     const rfHeldBlock = useRef(undefined);
 
-    const [ updater, setUpdater ] = useState(false);
+    const [ updater, setUpdater ] = useState({});
     
     //const [ grid, setGrid ] = useState({ instance: rfGrid.current });
 
@@ -289,6 +289,8 @@ function Game()
             }
         }
 
+        console.log("Game over");
+
         rfGameInProgress.current = false;
 
         // Disable user's ability to move the block.
@@ -300,6 +302,8 @@ function Game()
         updateStats();
 
         reRender();
+
+        console.log("Game over 2");
     };
 
     const handleExit = (pNavigate) =>
@@ -758,7 +762,7 @@ function Game()
 
     const reRender = () =>
     {
-        setUpdater(prev => !prev);
+        setUpdater({});
     }
 
     const isLandscape = () =>
