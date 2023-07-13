@@ -92,6 +92,8 @@ function Game()
 
     const isBlockThePrevHeldBlock = useRef(false);
 
+    const didHeldBlockJustSpawn = useRef(false);
+
     useEffect(
         () =>
         {
@@ -179,7 +181,15 @@ function Game()
         while (true)
         {
             // Simulate gravity (wait before dropping).
-            await utils.SleepFor(gSoftDrop ? gFallPeriodSoftDrop : lFallPeriodCurrent); //gSoftDrop ? gFallPeriodSoftDrop : lFallPeriodCurrent
+            await utils.SleepFor(gSoftDrop ? gFallPeriodSoftDrop : lFallPeriodCurrent);
+
+            // If the held block was just spawned in, wait again (i.e. 'reset' gravity).
+            if (didHeldBlockJustSpawn.current)
+            {
+                didHeldBlockJustSpawn.current = false;
+
+                await utils.SleepFor(gSoftDrop ? gFallPeriodSoftDrop : lFallPeriodCurrent);
+            }
 
             // Try to move the piece down the screen; if it can move down, continue.
             if (moveBlock(Vector2D.s_up, true))
@@ -195,46 +205,50 @@ function Game()
             const lIsPerfectClear = rfGrid.current.IsEmptyAfterClear();
 
             // If the user cleared at least one line.
-            if (lNumFullLines !== 0)
+            if (lNumFullLines != 0)
             {
                 // The current level.
                 let lLevel = Math.floor(getStat("lines") / gLengthLevel) + 1;
 
                 // Calculate the score from the line clears.
                 let lScoreFromLineClears = gScoresLineClears[lNumFullLines - 1] * lLevel;
+
+                // The score multiplier.
+                let lMultiplier = 1;
                 
-                // If all rows have been cleared (i.e. the grid is empty) double the line clears score.
-                // If all rows have been cleared, this is known as a 'perfect clear'.
+                // Modify the multiplier based on perfect clears.
                 if (lIsPerfectClear)
                 { 
                     gStreakStats.perfectClearStreak += 1;
 
                     console.log(`Perfect clear streak of ${gStreakStats.perfectClearStreak}.`);
 
-                    lScoreFromLineClears *= gStreakStats.perfectClearStreak;
+                    lMultiplier *= (gStreakStats.perfectClearStreak + 1)
                 }
                 else
                 {
                     gStreakStats.perfectClearStreak = 0;
                 }
 
-                // Factor in streaks.
-                if (lNumFullLines == gStreakStats.lineClearStreakNum)
+                // Factor in the user's streak.
+                if (lNumFullLines != 1)
                 {
                     gStreakStats.lineClearStreakCount += 1;
-                    console.log(`Streak of ${lNumFullLines} lines: ${gStreakStats.lineClearStreakCount}`);
+                    console.log(`Line clear streak of ${gStreakStats.lineClearStreakCount}.`);
 
-                    lScoreFromLineClears *= gStreakStats.lineClearStreakCount;
+                    lMultiplier *= gStreakStats.lineClearStreakCount;
                 }
-                else if (lNumFullLines != 1) // You can't get a streak on 1.
+                else
                 {
-                    gStreakStats.lineClearStreakNum = lNumFullLines;
-                    gStreakStats.lineClearStreakCount = 1;
+                    gStreakStats.lineClearStreakCount = 0;
                 }
+
+                // Multiply the base score.
+                lScoreFromLineClears *= lMultiplier;
 
                 console.log(`Score from ${lNumFullLines} lines: ${lScoreFromLineClears}`);
 
-                rfGrid.current.text = `+${lScoreFromLineClears}`;
+                rfGrid.current.text = `${lScoreFromLineClears} x${lMultiplier}`;
 
                 // Remove full lines.
                 await removeFullLines();
@@ -574,6 +588,8 @@ function Game()
             rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
             reRender();
         }
+
+        didHeldBlockJustSpawn.current = true;
     };
 
     const addScoreAndLines = (pScore, pLines) =>
@@ -956,16 +972,15 @@ const gStreakStats =
 {
     /*
     * The number of perfect clears the user has made in-a-row. The user's score is multiplied by whatever this number
-      is.
+      is. 
     */
     perfectClearStreak: 0,
 
     /*
-    * These numbers determine the user's line-clear streak. lineClearStreakNum refers to the number of lines the user
-      has cleared each time in the streak, while lineClearStreakCount is the number of line clears made. e.g. if the 
-      user clears 2 lines 3 times in a row, lineClearStreakNum is the 2, and lineClearStreakCount is the 3.
+    * The user's line-clear streak. This refers to the number of line-clears the user has made in-a-row without any of
+      them being only a single line. If you clear only a single line, your streak is ruined. This encourages strategic 
+      play by using all of the available information the game gives to you.
     */
-    lineClearStreakNum: 0,
     lineClearStreakCount: 0
 };
 

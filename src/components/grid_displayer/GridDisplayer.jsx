@@ -39,6 +39,23 @@ function GridDisplayer({ prGrid, prMaxWidth, prMaxHeight, prOnClick, prColourEmp
 
     const lFontSize = lDimensionTile * 0.8;
 
+    let lText = "";
+
+    let lWords = prGrid.text.split(" ");
+
+    // Each word of the text must be on its own line. Therefore, the length of each word must be a multiple of the 
+    // number of columns
+    for (const lWord of lWords)
+    {
+        let lLengthWordPadded;
+        if (lWord.length % lDimensionGrid.columns == 0)
+            lLengthWordPadded = lWord.length;
+        else
+            lLengthWordPadded = lDimensionGrid.columns - (lWord.length % lDimensionGrid.columns) + lWord.length;
+
+        lText += lWord.padEnd(lLengthWordPadded, " ");
+    }
+
     return (
         <div 
             style = {{ 
@@ -63,7 +80,7 @@ function GridDisplayer({ prGrid, prMaxWidth, prMaxHeight, prOnClick, prColourEmp
                                 key = { pIndex } 
                                 style = {{ width: lDimensionTile, height: lDimensionTile, backgroundColor: lColour }}
                             >
-                                { (prGrid.text && pIndex < prGrid.text.length) ? prGrid.text[pIndex] : undefined }
+                                { (lText && pIndex < lText.length) ? lText[pIndex] : undefined }
                             </div>
                         );
                     }

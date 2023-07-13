@@ -165,7 +165,8 @@ const CompOps = Object.freeze(
         L: 3,  // Less than (<)
         GE: 4, // Greater or Equal (>=)
         LE: 5  // Less than or Equal (<=)
-    });
+    }
+);
 
 const utils =
 {
