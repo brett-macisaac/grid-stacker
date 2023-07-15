@@ -17,11 +17,6 @@ import utils from '../../utils/utils';
 import utilsAppSpecific from '../../utils/utils_app_specific';
 import consts from '../../utils/constants';
 
-/*
-* A local storage key for the high-scores.
-*/
-const gLclStrgKeyHighScores = "HighScores";
-
 function Game() 
 {
     const location = useLocation();
@@ -426,8 +421,21 @@ function Game()
         { return false; }
 
         let lDidMove = rfBlock.current.Move(pMovement, rfGrid.current, true);
-        reRender();
-    
+
+        if (lDidMove)
+        {
+            if (pMovement == Vector2D.s_left)
+            {
+                new Audio(gSounds.left).play();
+            }
+            else if (pMovement == Vector2D.s_right)
+            {
+                new Audio(gSounds.right).play();
+            }
+
+            reRender();
+        }
+
         return lDidMove;
     };
 
@@ -443,8 +451,21 @@ function Game()
         { return false; }
 
         let lDidRotate = rfBlock.current.Rotate(pClockwise, rfGrid.current, true);
-        reRender();
-        
+
+        if (lDidRotate)
+        {
+            if (pClockwise)
+            {
+                new Audio(gSounds.clockwise).play();
+            }
+            else
+            {
+                new Audio(gSounds.anticlockwise).play();
+            }
+
+            reRender();
+        }
+
         return lDidRotate;
     }
 
@@ -457,7 +478,12 @@ function Game()
         { return false; }
 
         let lDidRotate = rfBlock.current.Rotate180(rfGrid.current);
-        reRender();
+
+        if (lDidRotate)
+        {
+            new Audio(gSounds.rotate180).play();
+            reRender();
+        }
 
         return lDidRotate;
     }
@@ -473,6 +499,11 @@ function Game()
         { return; }
 
         lNextBlock.changeRotationIndex(pClockwise);
+
+        if (pClockwise)
+            new Audio(gSounds.clockwise).play();
+        else
+            new Audio(gSounds.anticlockwise).play();
 
         reRender();
     }
@@ -522,7 +553,17 @@ function Game()
         if (!(rfBlock.current instanceof Block))
         { return; }
 
-        rfBlock.current.Shift(rfGrid.current, pDirection, false);
+        const lLengthShift = rfBlock.current.Shift(rfGrid.current, pDirection, false);
+
+        if (lLengthShift != 0)
+        {
+            if (pDirection == Vector2D.s_left)
+                new Audio(gSounds.shiftLeft).play();
+            else if (pDirection == Vector2D.s_right)
+                new Audio(gSounds.shiftRight).play();
+            else if (pDirection == Vector2D.s_up)
+                new Audio(gSounds.shiftDown).play();
+        }
         reRender();
     };
 
@@ -548,7 +589,9 @@ function Game()
         ];
 
         if (lCanSpawn)
+        {
             incrementTally(rfBlock.current.type);
+        }
 
         reRender();
 
@@ -788,6 +831,9 @@ function Game()
 
     const handleKeyDown = (pEvent) =>
     {
+        if (pEvent.repeat)
+            return;
+
         pEvent.stopPropagation();
         
         if (!rfBlock.current || !rfGameInProgress.current)
@@ -943,7 +989,7 @@ const gFallPeriodInterval = 100;
 /*
 * The period at which the block falls when the 'soft-drop' mode is active.
 */
-const gFallPeriodSoftDrop = gFallPeriodMin / 2;
+const gFallPeriodSoftDrop = 200;
 
 /*
 * The number of period cycles that may elapse.
@@ -986,5 +1032,17 @@ const gStreakStats =
 
 // A flag that, when true, indicates that the block should be 'soft dropped'.
 let gSoftDrop = false;
+
+const gSounds = 
+{
+    left: "./src/assets/sounds/arcade_beep.wav",
+    right: "./src/assets/sounds/arcade_beep.wav",
+    clockwise: "./src/assets/sounds/drill_1.mp3",
+    anticlockwise: "./src/assets/sounds/drill_2.mp3",
+    rotate180: "./src/assets/sounds/drill_3.mp3",
+    shiftLeft: "./src/assets/sounds/metal_impact.wav",
+    shiftRight: "./src/assets/sounds/metal_impact.wav",
+    shiftDown: "./src/assets/sounds/metal_impact.wav",
+};
 
 export default Game;

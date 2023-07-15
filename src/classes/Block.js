@@ -220,9 +220,12 @@ class Block
         {
             this.Rotate(!aClockwise, aGrid, false);
         }
-        
-        aGrid.DrawBlock(this);
-        
+
+        if (!aForceRotation)
+        {
+            aGrid.DrawBlock(this);
+        }
+
         return lIsRotationPossible;
     }
     
