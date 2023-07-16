@@ -14,7 +14,7 @@ import ThemeContext from "../../contexts/ThemeContext.js";
 import ButtonNextPage from '../../components/button_next_page/ButtonNextPage';
 import PageContainer from '../../components/page_container/PageContainer';
 import TextBlocks from '../../components/text_blocks/TextBlocks';
-import Container from '../../components/container/container';
+import Container from '../../components/container/Container';
 import TextStandard from '../../components/text_standard/TextStandard';
 import CheckBox from '../../components/check_box/CheckBox';
 
@@ -112,6 +112,8 @@ const styles =
     },
     conSFX:
     {
+        width: "100%",
+        maxWidth: 500,
         rowGap: utilsGlobalStyles.spacingVertN(-1),
     },
     text:
