@@ -16,6 +16,7 @@ import WindowSizeContext from '../../contexts/WindowSizeContext.js';
 import utils from '../../utils/utils';
 import utilsAppSpecific from '../../utils/utils_app_specific';
 import consts from '../../utils/constants';
+import sounds from '../../assets/sounds/sounds';
 
 function Game() 
 {
@@ -853,7 +854,8 @@ function Game()
         if (!lIsSoundActive)
             return;
 
-        const lSound = `./src/assets/sounds/typewriter_${utils.GetRandom(1, 5)}.mp3`
+        //const lSound = `./src/assets/sounds/typewriter_${utils.GetRandom(1, 5)}.mp3`
+        const lSound = sounds[utils.GetRandom(1, sounds.length - 1)];
 
         // For now, use lSound.
         new Audio(lSound).play();
