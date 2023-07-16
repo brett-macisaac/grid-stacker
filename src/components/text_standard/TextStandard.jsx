@@ -42,6 +42,7 @@ function TextStandard({ text, size, isBold, isMonospace, isItalic, style, remove
                 fontFamily: isMonospace ? globalProps.fontFamilyMono : "",
                 fontStyle: isItalic ? "italic" : "normal"
             }} 
+            className = "unselectable"
         >
             { text }
         </div>

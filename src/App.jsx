@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import ThemeContext from './contexts/ThemeContext';
 import PreferenceContext from './contexts/PreferenceContext';
 import WindowSizeContext from './contexts/WindowSizeContext';
+import SoundContext from './contexts/SoundContext';
 
 import './App.css';
 import pages from './pages/pages';
@@ -28,6 +29,11 @@ import globalProps, { utilsGlobalStyles } from './styles';
 const gLclStrgKeyThemeName = "themeName";
 
 /*
+* A localStorage key whose value is a string that corresponding to the app's current theme.
+*/
+const gLclStrgKeySound = "SFX";
+
+/*
 * Default game preferences.
 */
 const gPrefsDefault = { cols: 4, rows: 9, username: "", blocks: "IJLOSTZ" };
@@ -42,6 +48,8 @@ function App()
 
     // Global Preferences variable.
     const [ prefs, setPrefs ] = useState(utils.GetFromLocalStorage(consts.lclStrgKeyPreferences, gPrefsDefault));
+
+    const [ sound, setSound ] = useState(utils.GetFromLocalStorage(gLclStrgKeySound, true) === "true")
 
     // Global window size variable.
     const [ windowSize, setWindowSize ] = useState({ width: window.innerWidth, height: window.innerHeight });
@@ -65,6 +73,13 @@ function App()
     const updateWindowSize = () =>
     {
         setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    const updateSound = (pSFX) =>
+    {
+        setSound(pSFX);
+
+        utils.SetInLocalStorage(gLclStrgKeySound, pSFX ? "true" : "false");
     };
 
     /*
@@ -121,9 +136,10 @@ function App()
     );
 
     return (
-        <ThemeContext.Provider value = {{ themeName, updateTheme }}>
+        <ThemeContext.Provider      value = {{ themeName, updateTheme }}>
         <PreferenceContext.Provider value = {{ prefs, updatePrefs }}>
         <WindowSizeContext.Provider value = { windowSize }>
+        <SoundContext.Provider      value = {{ value: sound, updater: updateSound }}>
             
             <Router>
                 <Routes>
@@ -155,6 +171,7 @@ function App()
                 </Routes>
             </Router>
 
+        </SoundContext.Provider>
         </WindowSizeContext.Provider>
         </PreferenceContext.Provider>
         </ThemeContext.Provider>

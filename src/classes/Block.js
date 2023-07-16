@@ -165,9 +165,23 @@ class Block
 
     Rotate180(aGrid)
     {
+        const lPositionsOriginal = this.#fPositions.map((pPos) => { return pPos.copy(); })
+
         this.Rotate(true, aGrid, true, true);
 
-        return this.Rotate(true, aGrid, true, false);
+        // What happens if the second rotation isn't possible? The block will be returned to the position that it was in after
+        // the first rotation, which might not be possible.
+
+        const lIs180Possible = this.Rotate(true, aGrid, true, false, false, false);
+
+        if (!lIs180Possible)
+        {
+            this.#fPositions = lPositionsOriginal;
+        }
+
+        aGrid.DrawBlock(this);
+
+        return lIs180Possible;
     }
 
     /* Rotation Method
@@ -184,9 +198,9 @@ class Block
      * Return Value:
          > A boolean indicating whether or not the block was successfully rotated. 
     */
-    Rotate(aClockwise, aGrid, aTryOffsets = true, aForceRotation = false)
+    Rotate(aClockwise, aGrid, aTryOffsets = true, aForceRotation = false, aUndrawBlock = true, aDrawBlock = true)
     {
-        if (aTryOffsets)
+        if (aTryOffsets && aUndrawBlock)
         { aGrid.UnDrawBlock(this); }
         
         // The current rotation index (pre-rotation).
@@ -221,7 +235,7 @@ class Block
             this.Rotate(!aClockwise, aGrid, false);
         }
 
-        if (!aForceRotation)
+        if (aDrawBlock && !aForceRotation)
         {
             aGrid.DrawBlock(this);
         }

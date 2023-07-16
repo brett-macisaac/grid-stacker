@@ -63,6 +63,7 @@ function GridDisplayer({ prGrid, prMaxWidth, prMaxHeight, prOnClick, prColourEmp
                 borderColor: prColourBorder ? prColourBorder : lColourBackground, fontSize: lFontSize, textAlign: "center"
             }} 
             onClick = { prOnClick }
+            className = "unselectable"
         >
             {
                 prGrid.grid.map(

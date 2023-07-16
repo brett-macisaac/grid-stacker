@@ -39,6 +39,15 @@ class Grid
     * The text to display on the grid.
     */
     #fText;
+
+    /*
+    * When a user tries to move a block on the grid, the movement might be prevented by one of two things:
+        (1). A grid boundary, or
+        (2). Another already-placed block.
+      When this is true, the blocks movement was blocked by the grid boundary; if otherwise, false.
+    * Distinguishing between these two movement impediments might be useful when designing the game's sound effects.
+    */
+    #fWasMoveBlockedByBoundary;
     
     
 // Fields (7) ----------------------------------------------------------------------------------------------------------
@@ -95,6 +104,8 @@ class Grid
         this.#fNumColumns = aNumColumns;
 
         this.#fText = aText;
+
+        this.#fWasMoveBlockedByBoundary = false;
     }
     
     
@@ -132,6 +143,11 @@ class Grid
     get grid()
     {
         return this.#fGrid;
+    }
+
+    get wasMoveBlockedByBoundary()
+    {
+        return this.#fWasMoveBlockedByBoundary;
     }
 
     GetIndex(aCol, aRow)
@@ -274,15 +290,27 @@ class Grid
     }
 
     /*
-     * This method returns true if the given position/coordinate is both valid (within valid bounds) and empty; false if
+    * This method returns true if the given position/coordinate is both valid (within valid bounds) and empty; false if
        otherwise.
+    * It's expected that the Block class will use this method in the process of determining whether a block can be 
+      moved in a given direction.
        
      * Parameters:
          > aPosition: the position being checked.
     */
     CanBeMovedTo(aPosition)
     {
-        return this.IsPositionOnBoard(aPosition) && this.IsPositionEmpty(aPosition);
+        const lCanMove = this.IsPositionOnBoard(aPosition) && this.IsPositionEmpty(aPosition);
+
+        if (!lCanMove)
+        {
+            if (!this.IsPositionOnBoard(aPosition))
+                this.#fWasMoveBlockedByBoundary = true;
+            else 
+                this.#fWasMoveBlockedByBoundary = false;
+            
+        }
+        return lCanMove;
     }
     
     /*

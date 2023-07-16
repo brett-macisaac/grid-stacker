@@ -10,7 +10,7 @@ import Grid from '../../classes/Grid';
 import Block from '../../classes/Block';
 import Vector2D from '../../classes/Vector2D';
 import gridSymbols from './symbols_buttons';
-import ThemeContext from "../../contexts/ThemeContext.js";
+import SoundContext from '../../contexts/SoundContext';
 import PreferenceContext from '../../contexts/PreferenceContext.js';
 import WindowSizeContext from '../../contexts/WindowSizeContext.js';
 import utils from '../../utils/utils';
@@ -21,9 +21,8 @@ function Game()
 {
     const location = useLocation();
 
-    // Acquire global theme.
-    const { themeName } = useContext(ThemeContext);
-    let theme = globalProps.themes[themeName];
+    // Whether sound effects are activated.
+    const lIsSoundActive = useContext(SoundContext).value;
 
     // Acquire window size.
     const windowSize = useContext(WindowSizeContext);
@@ -335,13 +334,15 @@ function Game()
         const lGridDimensions = rfGrid.current.dimension;
 
         // The time taken to clear 1 line.
-        const lPausePerLine = 250
+        const lPausePerLine = 400;
 
         // The time to pause between individual tiles being shifted down (ms).
         const lPausePerTile = lPausePerLine / lGridDimensions.columns;
 
         // The number of full rows found thus far.
         let lNumFullRows = 0;
+
+        let lIndexSound = 0;
 
         for (let row = lGridDimensions.rows - 1; row >= 0; --row)
         {   
@@ -381,6 +382,9 @@ function Game()
                     rfGrid.current.EmptyTile(col, row);
                     reRender();
 
+                    playSound(gSounds.removeBlock[lIndexSound]);
+                    lIndexSound = (lIndexSound + 1) % gSounds.removeBlock.length;
+
                     await utils.SleepFor(lPausePerTile);
                 }
             }
@@ -404,6 +408,9 @@ function Game()
 
                     reRender();
 
+                    playSound(gSounds.removeBlock[lIndexSound]);
+                    lIndexSound = (lIndexSound + 1) % gSounds.removeBlock.length;
+
                     await utils.SleepFor(lPausePerTile);
                 }
                 
@@ -426,11 +433,15 @@ function Game()
         {
             if (pMovement == Vector2D.s_left)
             {
-                new Audio(gSounds.left).play();
+                playSound(gSounds.left);
             }
             else if (pMovement == Vector2D.s_right)
             {
-                new Audio(gSounds.right).play();
+                playSound(gSounds.right);
+            }
+            else if (pMovement == Vector2D.s_up)
+            {
+                playSound(gSounds.down);
             }
 
             reRender();
@@ -456,11 +467,11 @@ function Game()
         {
             if (pClockwise)
             {
-                new Audio(gSounds.clockwise).play();
+                playSound(gSounds.clockwise);
             }
             else
             {
-                new Audio(gSounds.anticlockwise).play();
+                playSound(gSounds.anticlockwise);
             }
 
             reRender();
@@ -481,7 +492,7 @@ function Game()
 
         if (lDidRotate)
         {
-            new Audio(gSounds.rotate180).play();
+            playSound(gSounds.rotate180);
             reRender();
         }
 
@@ -501,9 +512,9 @@ function Game()
         lNextBlock.changeRotationIndex(pClockwise);
 
         if (pClockwise)
-            new Audio(gSounds.clockwise).play();
+            playSound(gSounds.clockwise);
         else
-            new Audio(gSounds.anticlockwise).play();
+            playSound(gSounds.anticlockwise);
 
         reRender();
     }
@@ -531,6 +542,7 @@ function Game()
         // Rotate block 180 degrees (i.e. rotate twice in any direction).
         lNextBlock.changeRotationIndex(true); lNextBlock.changeRotationIndex(true);
 
+        playSound(gSounds.rotate180);
         reRender();
     }
 
@@ -545,6 +557,7 @@ function Game()
         // Rotate block 180 degrees (i.e. rotate twice in any direction).
         rfHeldBlock.current.changeRotationIndex(true); rfHeldBlock.current.changeRotationIndex(true);
 
+        playSound(gSounds.rotate180);
         reRender();
     }
 
@@ -557,12 +570,16 @@ function Game()
 
         if (lLengthShift != 0)
         {
-            if (pDirection == Vector2D.s_left)
-                new Audio(gSounds.shiftLeft).play();
-            else if (pDirection == Vector2D.s_right)
-                new Audio(gSounds.shiftRight).play();
-            else if (pDirection == Vector2D.s_up)
-                new Audio(gSounds.shiftDown).play();
+            const lSound = rfGrid.current.wasMoveBlockedByBoundary ? gSounds.impactBoundary : gSounds.impactBlocks;
+
+            playSound(lSound);
+
+            // if (pDirection == Vector2D.s_left)
+            //     new Audio(gSounds.shiftLeft).play();
+            // else if (pDirection == Vector2D.s_right)
+            //     new Audio(gSounds.shiftRight).play();
+            // else if (pDirection == Vector2D.s_up && lLengthShift > 1)
+            //     new Audio(gSounds.shiftDown).play();
         }
         reRender();
     };
@@ -631,6 +648,8 @@ function Game()
             rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
             reRender();
         }
+
+        playSound(gSounds.holdBlock);
 
         didHeldBlockJustSpawn.current = true;
     };
@@ -827,6 +846,17 @@ function Game()
     const isLandscape = () =>
     {
         return (windowSize.width > windowSize.height);
+    };
+
+    const playSound = (pSound) =>
+    {
+        if (!lIsSoundActive)
+            return;
+
+        const lSound = `./src/assets/sounds/typewriter_${utils.GetRandom(1, 5)}.mp3`
+
+        // For now, use lSound.
+        new Audio(lSound).play();
     };
 
     const handleKeyDown = (pEvent) =>
@@ -1033,16 +1063,53 @@ const gStreakStats =
 // A flag that, when true, indicates that the block should be 'soft dropped'.
 let gSoftDrop = false;
 
+// const gSounds = 
+// {
+//     left: "./src/assets/sounds/arcade_beep.wav",
+//     right: "./src/assets/sounds/arcade_beep.wav",
+//     down: "./src/assets/sounds/arcade_beep.wav",
+//     clockwise: "./src/assets/sounds/drill_1.mp3",
+//     anticlockwise: "./src/assets/sounds/drill_2.mp3",
+//     rotate180: "./src/assets/sounds/drill_3.mp3",
+//     impactBoundary: "./src/assets/sounds/metal_impact.wav",
+//     impactBlocks: "./src/assets/sounds/slap_1.mp3",
+//     removeBlock: [
+//         "./src/assets/sounds/typewriter_1.mp3",
+//         "./src/assets/sounds/typewriter_2.mp3",
+//         "./src/assets/sounds/typewriter_3.mp3",
+//         "./src/assets/sounds/typewriter_4.mp3",
+//         "./src/assets/sounds/typewriter_5.mp3"
+//     ],
+//     holdBlock: "./src/assets/sounds/beep_whoosh.wav",
+// };
+
+const gSoundsArray = 
+[
+    "./src/assets/sounds/typewriter_1.mp3",
+    "./src/assets/sounds/typewriter_2.mp3",
+    "./src/assets/sounds/typewriter_3.mp3",
+    "./src/assets/sounds/typewriter_4.mp3",
+    "./src/assets/sounds/typewriter_5.mp3",
+];
+
 const gSounds = 
 {
-    left: "./src/assets/sounds/arcade_beep.wav",
-    right: "./src/assets/sounds/arcade_beep.wav",
-    clockwise: "./src/assets/sounds/drill_1.mp3",
-    anticlockwise: "./src/assets/sounds/drill_2.mp3",
-    rotate180: "./src/assets/sounds/drill_3.mp3",
-    shiftLeft: "./src/assets/sounds/metal_impact.wav",
-    shiftRight: "./src/assets/sounds/metal_impact.wav",
-    shiftDown: "./src/assets/sounds/metal_impact.wav",
+    left: "./src/assets/sounds/typewriter_1.mp3",
+    right: "./src/assets/sounds/typewriter_2.mp3",
+    down: "./src/assets/sounds/typewriter_5.mp3",
+    clockwise: "./src/assets/sounds/typewriter_3.mp3",
+    anticlockwise: "./src/assets/sounds/typewriter_4.mp3",
+    rotate180: "./src/assets/sounds/typewriter_5.mp3",
+    impactBoundary: "./src/assets/sounds/typewriter_1.mp3",
+    impactBlocks: "./src/assets/sounds/typewriter_3.mp3",
+    removeBlock: [
+        "./src/assets/sounds/typewriter_1.mp3",
+        "./src/assets/sounds/typewriter_2.mp3",
+        "./src/assets/sounds/typewriter_3.mp3",
+        "./src/assets/sounds/typewriter_4.mp3",
+        "./src/assets/sounds/typewriter_5.mp3"
+    ],
+    holdBlock: "./src/assets/sounds/typewriter_5.mp3",
 };
 
 export default Game;
