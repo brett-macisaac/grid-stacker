@@ -199,6 +199,7 @@ const styles =
         flexDirection: "row",
         //justifyContent: "center",
         overflowX: "scroll",
+        flexShrink: 0
     },
     column:
     {

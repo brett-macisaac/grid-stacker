@@ -53,8 +53,15 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
     const lMaxHeightGameGrid = Math.floor(window.innerHeight);
     const lMaxWidthGameGrid = Math.floor(utils.GetPercentVal(styles.conGrid.width, window.innerWidth));
 
+    // The size of tjhe stats table's text.
+    const lSizeTextStatsTable = window.innerWidth >= 800 ? 0 : -1;
+
+    // The expected height of the stats table.
+    const lHeightStatsTable = defaultTableHeight(4, lSizeTextStatsTable, [ true, true, false, false ]);
+    console.log("Height of stats table: " + lHeightStatsTable);
+
     // The dimensions of the tally container.
-    const lHeightConTally = window.innerHeight - gHeightStatsTable;
+    const lHeightConTally = window.innerHeight - lHeightStatsTable;
     const lWidthConTally = utils.GetPercentVal(styles.conStats.width, window.innerWidth);
 
     // The maximum dimensions of the grids displayed in the tally container (such that there's two columns).
@@ -74,12 +81,12 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
 
     // The 'left' game buttons.
     const lGameButtonSymbolsLeft = [
-        prButtonSymbols.down, prButtonSymbols.leftMax, prButtonSymbols.hold, prButtonSymbols.left, prButtonSymbols.anticlockwise
+        prButtonSymbols.leftMax, prButtonSymbols.down, prButtonSymbols.hold, prButtonSymbols.left, prButtonSymbols.anticlockwise
     ];
 
     // The 'right' game buttons
     const lGameButtonSymbolsRight = [
-        prButtonSymbols.downMax, prButtonSymbols.rightMax, prButtonSymbols.rotate180, prButtonSymbols.right, prButtonSymbols.clockwise
+        prButtonSymbols.rightMax, prButtonSymbols.downMax, prButtonSymbols.rotate180, prButtonSymbols.right, prButtonSymbols.clockwise
     ];
 
     return ( 
@@ -178,7 +185,7 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                 </div>
                 <TableStandard 
                     prData = { prStats }
-                    prSizeText = { window.innerWidth >= 800 ? 0 : -1 }
+                    prSizeText = { lSizeTextStatsTable }
                     prBorders = { [ true, true, false, false ] }
                 />
             </div>
@@ -196,15 +203,6 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
             </div>
 
             <div style = {{ ...styles.conBlocks, ...styles.con, borderColor: theme.content }}>
-                <div style = { styles.conHoldBlock }>
-                    <TextStandard text = "HOLD" isBold style = {{ textAlign: "center" }} />
-                    <GridDisplayer 
-                        prGrid = { prGridHold } 
-                        prOnClick = { prHandlers.rotateHeldBlock }
-                        prMaxHeight = { lMaxHeightNextGrids } 
-                        prMaxWidth = { lMaxWidthNextGrids } 
-                    />
-                </div>
 
                 <div style = { styles.conNextBlocks }>
                     <TextStandard text = "NEXT" isBold style = {{ textAlign: "center" }} />
@@ -232,6 +230,17 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
                         )
                     }
                 </div>
+                
+                <div style = { styles.conHoldBlock }>
+                    <TextStandard text = "HOLD" isBold style = {{ textAlign: "center" }} />
+                    <GridDisplayer 
+                        prGrid = { prGridHold } 
+                        prOnClick = { prHandlers.rotateHeldBlock }
+                        prMaxHeight = { lMaxHeightNextGrids } 
+                        prMaxWidth = { lMaxWidthNextGrids } 
+                    />
+                </div>
+
             </div>
 
             <div 
@@ -404,6 +413,6 @@ const styles =
 };
 
 // The height of the 'stats table'.
-const gHeightStatsTable = Math.floor(defaultTableHeight(4, -1, [ true, true, false, false ]));
+const lHeightStatsTable = Math.floor(defaultTableHeight(4, -1, [ true, true, false, false ]));
 
 export default GameLandscape;

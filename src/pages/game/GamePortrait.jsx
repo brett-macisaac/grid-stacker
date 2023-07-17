@@ -145,15 +145,6 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
                 </div>
 
                 <div style = {{ ...styles.infoPanel, ...styles.infoPanelRight, borderColor: theme.content }}>
-                    <div style = { styles.conHoldBlock }>
-                        <TextStandard text = "HOLD" isBold style = {{ textAlign: "center" }} />
-                        <GridDisplayer 
-                            prGrid = { prGridHold } 
-                            prOnClick = { prHandlers.rotateHeldBlock }
-                            prMaxHeight = { gMaxHeightTallyGrid } 
-                            prMaxWidth = { gMaxWidthTallyGrid } 
-                        />
-                    </div>
 
                     <div style = { styles.conNextBlocks }>
                         <TextStandard text = "NEXT" isBold style = {{ textAlign: "center" }} />
@@ -181,6 +172,17 @@ function GamePortrait({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGame
                             )
                         }
                     </div>
+
+                    <div style = { styles.conHoldBlock }>
+                        <TextStandard text = "HOLD" isBold style = {{ textAlign: "center" }} />
+                        <GridDisplayer 
+                            prGrid = { prGridHold } 
+                            prOnClick = { prHandlers.rotateHeldBlock }
+                            prMaxHeight = { gMaxHeightTallyGrid } 
+                            prMaxWidth = { gMaxWidthTallyGrid } 
+                        />
+                    </div>
+
                 </div>
 
             </div>
@@ -346,7 +348,8 @@ const styles =
     infoPanelRight:
     {
         borderLeft: "2px solid",
-        rowGap: utilsGlobalStyles.spacingVertN()
+        rowGap: utilsGlobalStyles.spacingVertN(),
+        justifyContent: "flex-end",
     },
     conNextBlocks:
     {
@@ -400,16 +403,5 @@ const styles =
 
 // The height of the 'stats table'.
 const gHeightStatsTable = Math.floor(defaultTableHeight(4, -1, [ false, true, true, false ]));
-
-// The 'top' game buttons.
-const gGameButtonSymbolsTop = [
-    gridSymbols.left, gridSymbols.leftMax, gridSymbols.hold, gridSymbols.rightMax, gridSymbols.right
-];
-
-// The 'bottom' game buttons
-const gGameButtonSymbolsBottom = [
-    gridSymbols.anticlockwise, gridSymbols.down, gridSymbols.rotate180, gridSymbols.downMax, gridSymbols.clockwise
-];
-
 
 export default GamePortrait;

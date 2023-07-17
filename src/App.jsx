@@ -49,7 +49,7 @@ function App()
     // Global Preferences variable.
     const [ prefs, setPrefs ] = useState(utils.GetFromLocalStorage(consts.lclStrgKeyPreferences, gPrefsDefault));
 
-    const [ sound, setSound ] = useState(utils.GetFromLocalStorage(gLclStrgKeySound, true) === "true")
+    const [ sound, setSound ] = useState(utils.GetFromLocalStorage(gLclStrgKeySound, "true") === "true")
 
     // Global window size variable.
     const [ windowSize, setWindowSize ] = useState({ width: window.innerWidth, height: window.innerHeight });
