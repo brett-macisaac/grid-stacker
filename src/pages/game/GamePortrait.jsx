@@ -349,7 +349,6 @@ const styles =
     {
         borderLeft: "2px solid",
         rowGap: utilsGlobalStyles.spacingVertN(),
-        justifyContent: "flex-end",
     },
     conNextBlocks:
     {
