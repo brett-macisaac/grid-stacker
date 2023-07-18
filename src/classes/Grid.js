@@ -61,7 +61,7 @@ class Grid
             CentreLeft: "CentreLeft", 
             CentreTop: "CentreTop", 
             CentreBottom: "CentreBottom",
-            TopTwoRows: "TopTwoRows" // Spawn in the 'earliest' available position within the top two rows.
+            TopThreeRows: "TopThreeRows" // Spawn in the 'earliest' available position within the top two rows.
         }
     );
 
@@ -345,11 +345,11 @@ class Grid
             // The tetrominos should be centred in the columns (round to the left).
             lSpawnLocation = new Vector2D(Math.floor((this.#fNumColumns - 1) / 2), 1);
         }
-        else if (aDrawPosition === Grid.DrawPosition.TopTwoRows)
+        else if (aDrawPosition === Grid.DrawPosition.TopThreeRows)
         {
             lSpawnLocation = new Vector2D(0, 0);
 
-            for (let row = 0; row < 2; ++row)
+            for (let row = 0; row < 3; ++row)
             {
                 lSpawnLocation.y = row;
 
@@ -379,9 +379,9 @@ class Grid
         {
             return true;
         }
-        else if (aDrawPosition !== Grid.DrawPosition.TopTwoRows)
+        else if (aDrawPosition !== Grid.DrawPosition.TopThreeRows)
         {
-            return this.DrawBlockAt(aBlock, Grid.DrawPosition.TopTwoRows, aDrawShadow);
+            return this.DrawBlockAt(aBlock, Grid.DrawPosition.TopThreeRows, aDrawShadow);
         }
     }
     

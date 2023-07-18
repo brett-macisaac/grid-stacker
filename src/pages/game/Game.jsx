@@ -89,6 +89,8 @@ function Game()
 
     const didHeldBlockJustSpawn = useRef(false);
 
+    const rfDidHoldBlockNotSpawn = useRef(false);
+
     useEffect(
         () =>
         {
@@ -595,9 +597,9 @@ function Game()
         rfBlock.current = rfNextBlocks.current[rfNextBlocks.current.length - 1].copy();
         isBlockThePrevHeldBlock.current = false;
 
-        //let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
+        //let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopThreeRows, false);
         //reRender();
-        let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
+        let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopThreeRows, false);
 
         const lBlocks = location.state.blocks.split('');
 
@@ -627,32 +629,59 @@ function Game()
 
         rfGrid.current.UnDrawBlock(rfBlock.current);
 
+        let lCanSpawn = true;
+
         if (!rfHeldBlock.current)
         {
-            rfHeldBlock.current = rfBlock.current.copy();
 
-            rfBlock.current = undefined;
+            // If the next block can't spawn, do nothing.
+            const lNextBlock = rfNextBlocks.current[rfNextBlocks.current.length - 1];
 
-            spawnNextBlock();
+            lCanSpawn = rfGrid.current.DrawBlockAt(lNextBlock, Grid.DrawPosition.TopThreeRows, false);
+
+            if (lCanSpawn)
+            {
+                rfGrid.current.UnDrawBlock(lNextBlock);
+
+                rfHeldBlock.current = rfBlock.current.copy();
+
+                rfBlock.current = undefined;
+
+                spawnNextBlock();
+            }
         }
         else
         {
-            const lBlockCurrent = rfBlock.current.copy();
+            lCanSpawn = rfGrid.current.DrawBlockAt(rfHeldBlock.current, Grid.DrawPosition.CentreTop, false);
 
-            rfBlock.current = rfHeldBlock.current;
-            isBlockThePrevHeldBlock.current = true;
+            if (lCanSpawn)
+            {
+                const lBlockCurrent = rfBlock.current.copy();
 
-            rfHeldBlock.current = lBlockCurrent;
+                rfBlock.current = rfHeldBlock.current;
+                isBlockThePrevHeldBlock.current = true;
 
-            // let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
-            // reRender();
-            rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopTwoRows, false);
-            reRender();
+                rfHeldBlock.current = lBlockCurrent;
+            }
         }
 
-        playSound(gSounds.holdBlock);
+        if (lCanSpawn)
+        {
+            reRender(); 
+            playSound(gSounds.holdBlock);
+            didHeldBlockJustSpawn.current = true;
+        }
+        else
+        {
+            // Redraw the current block.
+            const lRedrawSuccessful = rfGrid.current.DrawBlock(rfBlock.current);
+            console.log("Can't spawn the held block.");
 
-        didHeldBlockJustSpawn.current = true;
+            if (lRedrawSuccessful)
+            {
+                console.log("The current block was successfully redrawn");
+            }
+        }
     };
 
     const addScoreAndLines = (pScore, pLines) =>
