@@ -92,8 +92,6 @@ function App()
         setUser(pUser);
 
         utils.SetInLocalStorage(consts.lclStrgKeyUser, pUser);
-
-        ApiRequestor.setAuthToken(pUser.token);
     }
 
     /*
@@ -153,6 +151,14 @@ function App()
             }
         },
         []
+    );
+
+    useEffect(
+        () =>
+        {
+            ApiRequestor.setAuthToken(user.token);
+        },
+        [ user ]
     );
 
     return (

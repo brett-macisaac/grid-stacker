@@ -58,7 +58,6 @@ function GameLandscape({ prGrid, prBlockTallies, prNextBlocks, prGridHold, prGam
 
     // The expected height of the stats table.
     const lHeightStatsTable = defaultTableHeight(4, lSizeTextStatsTable, [ true, true, false, false ]);
-    console.log("Height of stats table: " + lHeightStatsTable);
 
     // The dimensions of the tally container.
     const lHeightConTally = window.innerHeight - lHeightStatsTable;

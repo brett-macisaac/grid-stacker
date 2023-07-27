@@ -102,7 +102,7 @@ class ApiRequestor
                 lDetails
             );
 
-            //console.log(lResponse);
+            console.log(lResponse);
 
             return lResponse.data;
         }
