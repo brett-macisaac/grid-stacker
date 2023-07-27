@@ -97,7 +97,7 @@ function TableStandard({ prRowHeader, prRowsContent, prData, prSizeText, prBorde
 
     return (
         <div
-            className = "hideScrollBar"
+            className = "hideScrollBar tableStandard"
             style = {{ 
                 backgroundColor: theme.buttonContent,
                 ...styles.table, 

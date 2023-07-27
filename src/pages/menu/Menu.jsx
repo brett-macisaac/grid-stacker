@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import globalProps, { utilsGlobalStyles } from '../../styles';
-import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
+import headerButtons from '../../components/header_buttons/HeaderButtons';
+import ApiRequestor from '../../ApiRequestor';
 
 import ButtonStandard from '../../components/button_standard/ButtonStandard.jsx';
 import TextStandard from '../../components/text_standard/TextStandard';
@@ -19,6 +20,8 @@ import TextBlocks from '../../components/text_blocks/TextBlocks';
 import utils from '../../utils/utils';
 import consts from '../../utils/constants';
 import ThemeContext from "../../contexts/ThemeContext.js";
+import UserContext from '../../contexts/UserContext';
+import { PopUpOk } from '../../components/pop_up_standard/PopUpStandard.jsx';
 import utilsAppSpecific from '../../utils/utils_app_specific';
 
 function Menu({}) 
@@ -27,26 +30,63 @@ function Menu({})
     const { themeName } = useContext(ThemeContext);
     let theme = globalProps.themes[themeName];
 
+    const lUserContext = useContext(UserContext);
+
     const navigate = useNavigate();
 
-    // The total number of games played on this device.
-    const totalGamesLocal = useRef(utils.GetFromLocalStorage(consts.lclStrgKeyTotalTimesPlayed, 0));
+    const [ stMetaStatsLocal, setMetaStatsLocal ] = useState(utils.GetFromLocalStorage(consts.lclStrgKeyMetaStats));
 
-    // The total number of games played globally by all users. Use an API call to get this value from the database.
-    const totalGamesGlobal = useRef(0);
+    const [ stMetaStatsGlobal, setMetaStatsGlobal ] = useState(undefined);
+
+    const [ stOptionsPopUpMsg, setOptionsPopUpMsg] = useState(undefined);
 
     const handlePlay = () =>
     {
+        if (!lUserContext.value)  // If the user isn't signed in.
+        {
+            setOptionsPopUpMsg(
+                {
+                    title: "Not Signed In",
+                    message: "You aren't signed in, meaning that your high-scores won't be recorded globally. Do you wish to continue?",
+                    buttons: [
+                        { text: "Continue as Guest", onPress: () => { navigate("/gameParams") } },
+                        { text: "Sign In", onPress: () => { navigate("/signIn") } },
+                        { text: "Create Account", onPress: () => { navigate("/signUp") } },
+                    ]
+                }
+            );
+            return;
+        }
         navigate("/gameParams");
     };
+
+    useEffect(
+        () =>
+        {
+            const setMetaStats = async () =>
+            {
+                const lMetaStats = await ApiRequestor.getMetaStats();
+
+                console.log(lMetaStats);
+
+                if (lMetaStats)
+                    setMetaStatsGlobal(lMetaStats);
+            }
+
+            setMetaStats();
+        },
+        []
+    )
 
     return ( 
         <PageContainer
             navigate = { navigate }
             buttonNavBarText = "PLAY"
             buttonNavBarHandler = { handlePlay }
-            optionsRightHeaderButtons = { [ optionsHeaderButtons.settings ] }
+            headerBtnsLeft = { [ headerButtons.account ] }
+            headerBtnsRight = { [ headerButtons.settings ] }
             style = { styles.container }
+            optionsPopUpMsg = { stOptionsPopUpMsg }
         >
             {/* Title */}
             <TextBlocks 
@@ -56,11 +96,26 @@ function Menu({})
             />
 
             <Container style = { styles.conGameCount }>
-                <TextStandard text = "Number of Games Played" isItalic />
-                <CountLabel text = "This Device" count = { totalGamesLocal.current } style = { styles.countLabel } />
+                <TextStandard text = "Local Stats" isItalic isBold size = {1} />
+                <CountLabel text = "Games Played" count = { stMetaStatsLocal.totalGames } style = { styles.countLabel } />
 
-                <CountLabel text = "Global" count = { totalGamesGlobal.current } style = { styles.countLabel } />
+                <CountLabel text = "Total Score" count = { stMetaStatsLocal.totalScore } style = { styles.countLabel } />
+
+                <CountLabel text = "Total Lines" count = { stMetaStatsLocal.totalLines } style = { styles.countLabel } />
             </Container>
+
+            {
+                stMetaStatsGlobal && (
+                    <Container style = { styles.conGameCount }>
+                        <TextStandard text = "Global Stats" isItalic isBold size = {1} />
+                        <CountLabel text = "Games Played" count = { stMetaStatsGlobal.totalGames } style = { styles.countLabel } />
+        
+                        <CountLabel text = "Total Score" count = { stMetaStatsGlobal.totalScore } style = { styles.countLabel } />
+        
+                        <CountLabel text = "Total Lines" count = { stMetaStatsGlobal.totalLines } style = { styles.countLabel } />
+                    </Container>
+                )
+            }
 
             {/* <TextBlocks 
                 prText = "GS" prSizeText = { 300 } 
@@ -77,12 +132,12 @@ const styles =
 {
     title:
     {
-        marginBottom: utilsGlobalStyles.spacingVertN(1)
+        //marginBottom: utilsGlobalStyles.spacingVertN(1)
     },
     container:
     {
         //justifyContent: "space-between", 
-        rowGap: utilsGlobalStyles.spacingVertN(-1),
+        rowGap: utilsGlobalStyles.spacingVertN(1),
         alignItems: "center",
     },
     conGameCount:

@@ -26,15 +26,15 @@ const glclStrgKeyLogoColours = "HeaderLogoColours";
 
 * Props:
     > navigate: the object that allows for navigate to pages in the app.
-    > optionsLeftButtons: an array of options for each of the header buttons placed on the left. Each element is an 
+    > btnsLeft: an array of options for each of the header buttons placed on the left. Each element is an 
       object that has three properties: icon, onPress, and left. The icon is a function that takes a parameter list of 
       (size, colour) and returns a vector icon (such as from Ionicons) that uses the size and colour arguments for its 
       corresponding props. The onPress prop is a function that's called when the icon is clicked.
-    > optionsRightButtons: same as optionsLeftButtons but for the buttons on the right.
+    > btnsRight: same as btnsLeft but for the buttons on the right.
     > setOptionsPopUpMsg: a function that's used to have a pop-up message appear. This may be desirable to warn the user
       when they click a button in the header, such as an 'exit' button that might cause them to lose progress.
 */
-const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsPopUpMsg }) => 
+const Header = ({ navigate, btnsLeft, btnsRight, setOptionsPopUpMsg }) => 
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -74,21 +74,14 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
 
             <div style = { { ...styles.sideContainer, ...styles.leftContainer } }>
                 {
-                    optionsLeftButtons && optionsLeftButtons.map(
-                        (options, index) =>
+                    btnsLeft && btnsLeft.map(
+                        (BtnComponent, pIndex) =>
                         {
-                            return (
-                                <HeaderButton 
-                                    key = { index }
-                                    icon = { options.icon }
-                                    onPress = { 
-                                        () => { options.onPress(navigate, setOptionsPopUpMsg) } 
-                                    }
-                                />
-                            )
+                            return <BtnComponent key = { pIndex } prNavigate = { navigate } />
                         }
                     )
                 }
+                {/* { btnsLeft } */}
             </div>
 
             <div 
@@ -104,7 +97,16 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
 
             <div style = { { ...styles.sideContainer, ...styles.rightContainer } }>
                 {
-                    optionsRightButtons && optionsRightButtons.map(
+                    btnsRight && btnsRight.map(
+                        (BtnComponent, pIndex) =>
+                        {
+                            return <BtnComponent key = { pIndex } prNavigate = { navigate } />
+                        }
+                    )
+                }
+                {/* { btnsRight } */}
+                {/* {
+                    btnsRight && btnsRight.map(
                         (options, index) =>
                         {
                             return (
@@ -118,7 +120,7 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
                             )
                         }
                     )
-                }
+                } */}
             </div>
 
         </div>
@@ -128,21 +130,11 @@ const Header = ({ navigate, optionsLeftButtons, optionsRightButtons, setOptionsP
 Header.propTypes =
 {
     navigate: PropTypes.func.isRequired,
-    optionsLeftButtons: PropTypes.arrayOf(
-        PropTypes.shape(
-            {
-                icon: PropTypes.func.isRequired,
-                onPress: PropTypes.func.isRequired
-            }
-        )
+    btnsLeft:  PropTypes.arrayOf(
+        PropTypes.elementType
     ),
-    optionsRightButtons: PropTypes.arrayOf(
-        PropTypes.shape(
-            {
-                icon: PropTypes.func.isRequired,
-                onPress: PropTypes.func.isRequired
-            }
-        )
+    btnsRight: PropTypes.arrayOf(
+        PropTypes.elementType
     ),
     setOptionsPopUpMsg: PropTypes.func
 };

@@ -32,7 +32,14 @@ export default defineConfig(
     {
         plugins: [
             react(),
-            VitePWA({ registerType: 'autoUpdate', manifest: manifest })
+            VitePWA({ 
+                registerType: 'autoUpdate', 
+                manifest: manifest,
+                devOptions: {
+                    enabled: true,
+                    type: "module",
+                },
+            })
         ],
     }
 )

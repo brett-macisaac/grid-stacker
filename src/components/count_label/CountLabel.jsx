@@ -39,7 +39,7 @@ function CountLabel({ text, count, size, style })
 CountLabel.propTypes =
 {
     text: PropTypes.string.isRequired,
-    count: PropTypes.number.isRequired,
+    count: PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]).isRequired,
     size: PropTypes.number,
     style: PropTypes.object
 };

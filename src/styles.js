@@ -1,7 +1,7 @@
 
 const gWidthScreen = window.innerWidth;
 
-const gMaxWidthContainer = 350;
+const gMaxWidthContainer = 400;
 
 const gWidthCon = gWidthScreen * 0.9 > gMaxWidthContainer ? gMaxWidthContainer : gWidthScreen * 0.9;
 
@@ -209,6 +209,22 @@ function isThemeDark(themeName)
     return themeName.includes("dark");
 }
 
+const globalStyles =
+{
+    textBox:
+    {
+        width: "100%",
+        maxWidth: 300
+    },
+    button:
+    {
+        width: "100%",
+        maxWidth: 300,
+        padding: 15,
+        borderRadius: globalProps.borderRadiusStandard
+    }
+};
+
 /*
 * Utility functions used throughout the application to assist with styling.
 */
@@ -219,4 +235,4 @@ const utilsGlobalStyles =
     isThemeDark: isThemeDark
 };
 
-export { globalProps as default, utilsGlobalStyles };
+export { globalProps as default, utilsGlobalStyles, globalStyles };

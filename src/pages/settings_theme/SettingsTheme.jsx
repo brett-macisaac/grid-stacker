@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import globalProps, { utilsGlobalStyles } from '../../styles';
-import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
+import headerButtons from '../../components/header_buttons/HeaderButtons';
 import ThemeContext from "../../contexts/ThemeContext.js";
 import TextStandard from '../../components/text_standard/TextStandard';
 import PageContainer from '../../components/page_container/PageContainer';
@@ -18,7 +18,7 @@ function SettingsThemes()
     return ( 
         <PageContainer
             navigate = { navigate }
-            optionsLeftHeaderButtons = { [ optionsHeaderButtons.back ] }
+            headerBtnsLeft = { [ headerButtons.back ] }
             style = { styles.container }
         >
 

@@ -210,7 +210,10 @@ const styles =
     {
         paddingTop: utilsGlobalStyles.fontSizeN() / 2,
         paddingBottom: utilsGlobalStyles.fontSizeN() / 2,
-        borderRadius: globalProps.borderRadiusStandard
+        borderRadius: globalProps.borderRadiusStandard,
+        width: "100%",
+        maxWidth: 300,
+        alignSelf: "center"
     }
 };
 

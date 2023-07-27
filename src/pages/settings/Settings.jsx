@@ -7,7 +7,7 @@ import Info from '@mui/icons-material/Info';
 import globalProps, { utilsGlobalStyles } from '../../styles';
 import consts from '../../utils/constants.js';
 import utils from '../../utils/utils.js';
-import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
+import headerButtons from '../../components/header_buttons/HeaderButtons';
 
 import SoundContext from '../../contexts/SoundContext';
 import ThemeContext from "../../contexts/ThemeContext.js";
@@ -32,7 +32,8 @@ function Settings()
     return ( 
         <PageContainer
             navigate = { navigate }
-            optionsLeftHeaderButtons = { [ optionsHeaderButtons.back ] }
+            headerBtnsLeft = { [ headerButtons.back ] }
+            headerBtnsRight = { [ headerButtons.account ] }
             style = { styles.container }
         >
 

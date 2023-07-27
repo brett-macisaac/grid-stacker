@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import globalProps, { utilsGlobalStyles } from '../../styles';
-import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
+import headerButtons from '../../components/header_buttons/HeaderButtons';
 
 import Container from '../../components/container/Container';
 import ControlDescription from './ControlDescription';
@@ -25,8 +25,7 @@ function Controls()
     return ( 
         <PageContainer
             navigate = { navigate }
-            optionsLeftHeaderButtons = { [ optionsHeaderButtons.back ] }
-            optionsRightHeaderButtons = { [ optionsHeaderButtons.settings ] }
+            headerBtnsLeft = { [ headerButtons.back ] }
             style = { styles.container }
         >
 

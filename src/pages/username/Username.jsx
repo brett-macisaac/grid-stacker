@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import globalProps, { utilsGlobalStyles } from '../../styles';
 import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
@@ -36,23 +36,17 @@ function Username()
     // The user's preferences and the function that handles updating it.
     const { prefs, updatePrefs } = useContext(PreferenceContext);
 
-    const [ username, setUsername ] = useState(prefs.username);
+    const [ username, setUsername ] = useState(prefs.usernameGuest);
 
-    const [ prevPlayers, setPrevPlayers ] = useState([]);
+    const [ prevPlayers, setPrevPlayers ] = useState(utils.GetFromLocalStorage(gLclStrgKeyPreviousPlayers, []));
 
     const [ optionsPopUpMsg, setOptionsPopUpMsg ] = useState(undefined);
 
     const navigate = useNavigate();
-    const location = useLocation();
 
     useEffect(
         () =>
         {
-            const lPrevPlayers = utils.GetFromLocalStorage(gLclStrgKeyPreviousPlayers, []);
-
-            setPrevPlayers(lPrevPlayers);
-
-            //console.log(lPrevPlayers);
         },
         []
     );
@@ -61,21 +55,21 @@ function Username()
     {
         setUsername(pNewUserName);
 
-        updatePrefs("username", pNewUserName);
+        updatePrefs("usernameGuest", pNewUserName);
     };
 
     const selectPrevPlayer = (pUsername) =>
     {
         setUsername(pUsername);
 
-        updatePrefs("username", pUsername);
+        updatePrefs("usernameGuest", pUsername);
     };
 
     const handlePlay = () =>
     {
         if (username == "")
         {
-            setOptionsPopUpMsg(PopUpOk("No Username", "You must enter a username to play."));
+            setOptionsPopUpMsg(PopUpOk("No Username", "You must enter a guest username to play."));
             return;
         }
 
@@ -86,7 +80,7 @@ function Username()
             utils.SetInLocalStorage(gLclStrgKeyPreviousPlayers, [ ...prevPlayers, username ]);
         }
         
-        navigate("/game", { state: { ...location.state, username: username } });
+        navigate("/game");
     };
 
     return ( 
@@ -108,13 +102,13 @@ function Username()
             />
 
             <TextStandard 
-                text = "Enter your username below. Your username will display beside any high-scores you make." 
+                text = "Because you are signed out, you must play with a guest account. Enter a username below to continue." 
                 style = {{ textAlign: "center", maxWidth: 400 }} 
                 isItalic 
             />
 
             <TextInputStandard 
-                placeholder = "Username..."
+                placeholder = "Username"
                 text = { username } 
                 onChangeText = { (pNewText) => handleTextInput(pNewText) } 
                 maxLength = { 20 } 

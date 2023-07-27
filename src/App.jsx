@@ -7,12 +7,14 @@ import ThemeContext from './contexts/ThemeContext';
 import PreferenceContext from './contexts/PreferenceContext';
 import WindowSizeContext from './contexts/WindowSizeContext';
 import SoundContext from './contexts/SoundContext';
+import UserContext from './contexts/UserContext';
 
 import './App.css';
 import pages from './pages/pages';
 import utils from './utils/utils';
 import consts from './utils/constants';
 import globalProps, { utilsGlobalStyles } from './styles';
+import ApiRequestor from './ApiRequestor';
 
 /* Ideas
 * Add a preview/summary of the options that the user selects on the game parameters page, in addition to the stats.
@@ -24,19 +26,9 @@ import globalProps, { utilsGlobalStyles } from './styles';
 */
 
 /*
-* A localStorage key whose value is a string that corresponding to the app's current theme.
-*/
-const gLclStrgKeyThemeName = "themeName";
-
-/*
-* A localStorage key whose value is a string that corresponding to the app's current theme.
-*/
-const gLclStrgKeySound = "SFX";
-
-/*
 * Default game preferences.
 */
-const gPrefsDefault = { cols: 4, rows: 9, username: "", blocks: "IJLOSTZ" };
+const gPrefsDefault = { cols: 4, rows: 9, usernameGuest: "", blocks: "IJLOSTZ" };
 
 function App() 
 {
@@ -44,12 +36,12 @@ function App()
     const [ themeName, setThemeName ] = useState(utils.GetFromLocalStorage(gLclStrgKeyThemeName, globalProps.themeDefault));
     let theme = globalProps.themes[themeName];
 
-    //Grid.sColourEmptyTile = theme.emptyGridCell;
-
     // Global Preferences variable.
     const [ prefs, setPrefs ] = useState(utils.GetFromLocalStorage(consts.lclStrgKeyPreferences, gPrefsDefault));
 
-    const [ sound, setSound ] = useState(utils.GetFromLocalStorage(gLclStrgKeySound, "true") === "true")
+    const [ sound, setSound ] = useState(utils.GetFromLocalStorage(gLclStrgKeySound, "true") === "true");
+
+    const [ user, setUser ] = useState(utils.GetFromLocalStorage(consts.lclStrgKeyUser, undefined));
 
     // Global window size variable.
     const [ windowSize, setWindowSize ] = useState({ width: window.innerWidth, height: window.innerHeight });
@@ -81,6 +73,28 @@ function App()
 
         utils.SetInLocalStorage(gLclStrgKeySound, pSFX ? "true" : "false");
     };
+
+    const updateUser = (pUser) =>
+    {
+        if (!pUser)
+        {
+            setUser(undefined);
+            localStorage.removeItem(consts.lclStrgKeyUser);
+            return;
+        }
+
+        if (!("username" in pUser) || !("token" in pUser))
+        {
+            console.log("Invalid user data!");
+            return;
+        }
+
+        setUser(pUser);
+
+        utils.SetInLocalStorage(consts.lclStrgKeyUser, pUser);
+
+        ApiRequestor.setAuthToken(pUser.token);
+    }
 
     /*
     * Updates the themeName.
@@ -114,14 +128,20 @@ function App()
     useEffect(
         () =>
         {
-            if (!localStorage.getItem(consts.lclStrgKeyTotalTimesPlayed))
-            { utils.SetInLocalStorage(consts.lclStrgKeyTotalTimesPlayed, 0); }
+            if (!localStorage.getItem(consts.lclStrgKeyMetaStats))
+            { 
+                utils.SetInLocalStorage(
+                    consts.lclStrgKeyMetaStats, 
+                    {
+                        totalGames: 0,
+                        totalScore: 0,
+                        totalLines: 0
+                    }
+                );
+            }
 
-            if (!localStorage.getItem(consts.lclStrgKeyHighScores))
-            { utils.SetInLocalStorage(consts.lclStrgKeyHighScores, { }); }
-
-            if (!localStorage.getItem(consts.lclStrgKeyTimesPlayed))
-            { utils.SetInLocalStorage(consts.lclStrgKeyTimesPlayed, { }); }
+            if (!localStorage.getItem(consts.lclStrgKeyGameStats))
+            { utils.SetInLocalStorage(consts.lclStrgKeyGameStats, { }); }
 
             // Set-up an event-listener for window resize.
             window.addEventListener('resize', utils.Debounce(updateWindowSize, 200));
@@ -140,6 +160,7 @@ function App()
         <PreferenceContext.Provider value = {{ prefs, updatePrefs }}>
         <WindowSizeContext.Provider value = { windowSize }>
         <SoundContext.Provider      value = {{ value: sound, updater: updateSound }}>
+        <UserContext.Provider       value = {{ value: user, updater: updateUser }}>
             
             <Router>
                 <Routes>
@@ -171,6 +192,7 @@ function App()
                 </Routes>
             </Router>
 
+        </UserContext.Provider>
         </SoundContext.Provider>
         </WindowSizeContext.Provider>
         </PreferenceContext.Provider>
@@ -178,5 +200,15 @@ function App()
     );
 
 }
+
+/*
+* A localStorage key whose value is a string that corresponding to the app's current theme.
+*/
+const gLclStrgKeyThemeName = "themeName";
+
+/*
+* A localStorage key whose value is a string that corresponding to the app's current theme.
+*/
+const gLclStrgKeySound = "SFX";
 
 export default App;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
 
 import globalProps, { utilsGlobalStyles } from '../../styles';
 import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
@@ -13,15 +12,15 @@ import gridSymbols from './symbols_buttons';
 import SoundContext from '../../contexts/SoundContext';
 import PreferenceContext from '../../contexts/PreferenceContext.js';
 import WindowSizeContext from '../../contexts/WindowSizeContext.js';
+import UserContext from '../../contexts/UserContext';
 import utils from '../../utils/utils';
 import utilsAppSpecific from '../../utils/utils_app_specific';
 import consts from '../../utils/constants';
 import sounds from '../../assets/sounds/sounds';
+import ApiRequestor from '../../ApiRequestor';
 
 function Game() 
 {
-    const location = useLocation();
-
     // Whether sound effects are activated.
     const lIsSoundActive = useContext(SoundContext).value;
 
@@ -30,6 +29,11 @@ function Game()
 
     // The user's preferences.
     const { prefs } = useContext(PreferenceContext);
+
+    const lUserContext = useContext(UserContext);
+
+    // Whether the user is signed-in.
+    const lIsSignedIn = lUserContext.value;
 
     // An object that tracks how much of each tally has been updated.
     const [ blockTallies, setBlockTallies ] = useState(
@@ -46,7 +50,7 @@ function Game()
         [ ...Array(4) ].map(
             () =>
             {
-                const lBlocks = location.state.blocks.split('');
+                const lBlocks = prefs.blocks.split('');
                 return new Block(lBlocks[utils.GetRandom(0, lBlocks.length - 1)]);
             }
         )
@@ -59,7 +63,7 @@ function Game()
     //const [ grid, setGrid ] = useState({ instance: rfGrid.current });
 
     const rfGrid = useRef(
-        new Grid(location.state.cols, location.state.rows)  
+        new Grid(prefs.cols, prefs.rows)  
     );
 
     const rfBlock = useRef(undefined);
@@ -73,9 +77,10 @@ function Game()
                 orderRows: [ "highScoreGlobal", "highScoreLocal", "scoreNow" ],
                 rows:
                 {
-                    highScoreGlobal: { title: "HI (G)", score: "-", lines: "-", user:  "-" },
-                    highScoreLocal: { title: "HI (L)", score: "-", lines: "-", user:  "-" },
-                    scoreNow: { title: "NOW", score: "-", lines: "-", user: location.state.username }
+                    highScoreGlobal: { title: "HI - GLOBAL", score: "-", lines: "-", user:  "-" },
+                    highScoreLocal: { title: "HI - LOCAL", score: "-", lines: "-", user:  "-" },
+                    scoreNow: { title: "NOW", score: "-", lines: "-", 
+                                user: lIsSignedIn ? lUserContext.value.username : prefs.usernameGuest }
                 }
             }
         }
@@ -89,23 +94,35 @@ function Game()
 
     const didHeldBlockJustSpawn = useRef(false);
 
-    const rfDidHoldBlockNotSpawn = useRef(false);
-
     useEffect(
         () =>
         {
-            const lHighScores = utils.GetFromLocalStorage(consts.lclStrgKeyHighScores);
+            const lGameStats = utils.GetFromLocalStorage(consts.lclStrgKeyGameStats);
 
-            const lKeyGridSize = utilsAppSpecific.getGridSizeKey(location.state.cols, location.state.rows);
+            const lKeyGridSize = utilsAppSpecific.getGridSizeKey(prefs.cols, prefs.rows);
 
-            if (location.state.blocks in lHighScores && lKeyGridSize in lHighScores[location.state.blocks])
+            if (prefs.blocks in lGameStats && lKeyGridSize in lGameStats[prefs.blocks])
             {
-                stats.current.content.rows.highScoreLocal.score = lHighScores[location.state.blocks][lKeyGridSize].score;
-                stats.current.content.rows.highScoreLocal.lines = lHighScores[location.state.blocks][lKeyGridSize].lines;
-                stats.current.content.rows.highScoreLocal.user = lHighScores[location.state.blocks][lKeyGridSize].user;
+                stats.current.content.rows.highScoreLocal.score = lGameStats[prefs.blocks][lKeyGridSize].score;
+                stats.current.content.rows.highScoreLocal.lines = lGameStats[prefs.blocks][lKeyGridSize].lines;
+                stats.current.content.rows.highScoreLocal.user = lGameStats[prefs.blocks][lKeyGridSize].user;
             }
 
-            // Get global (i.e. all-time) high-score for the current dimensions (if connection is possible and the returned value isn't 0).
+            const setGlobalStats = async () =>
+            {
+                // Get global stats (if available).
+                let lGameStatsGlobal = await ApiRequestor.getGameStats({ "blocks": prefs.blocks, "grid": lKeyGridSize });
+
+                if (!lGameStatsGlobal)
+                    return;
+
+                stats.current.content.rows.highScoreGlobal.score = lGameStatsGlobal.score;
+                stats.current.content.rows.highScoreGlobal.lines = lGameStatsGlobal.lines;
+                stats.current.content.rows.highScoreGlobal.user = lGameStatsGlobal.user;
+
+                reRender();
+            };
+            setGlobalStats();
 
             // Get some random block colours for the buttons.
             const lRandomColours = utilsAppSpecific.getRandomBlockColours(4);
@@ -601,7 +618,7 @@ function Game()
         //reRender();
         let lCanSpawn = rfGrid.current.DrawBlockAt(rfBlock.current, Grid.DrawPosition.TopThreeRows, false);
 
-        const lBlocks = location.state.blocks.split('');
+        const lBlocks = prefs.blocks.split('');
 
         rfNextBlocks.current = [ 
             new Block(lBlocks[utils.GetRandom(0, lBlocks.length - 1)]),
@@ -699,79 +716,87 @@ function Game()
     /*
     * Once a game is over, this function should be called to update the game's stats.
     */
-    const updateStats = () =>
+    const updateStats = async () =>
     {
-        // Update the 'total times played' variable.
-        const lTotalTimesPlayed = utils.GetFromLocalStorage(consts.lclStrgKeyTotalTimesPlayed);
-        utils.SetInLocalStorage(consts.lclStrgKeyTotalTimesPlayed, lTotalTimesPlayed + 1);
+        // The user's stats.
+        const lScoreNow = getStat("score");
+        const lLinesNow = getStat("lines");
+        const lUserNow = getStat("user");
+
+        // Update the 'meta' stats.
+        const lMetaStats = utils.GetFromLocalStorage(consts.lclStrgKeyMetaStats);
+        lMetaStats.totalGames += 1;
+        lMetaStats.totalLines += lLinesNow;
+        lMetaStats.totalScore += lScoreNow;
+        utils.SetInLocalStorage(consts.lclStrgKeyMetaStats, lMetaStats);
 
         // The grid-size key.
-        const lKeyGridSize = utilsAppSpecific.getGridSizeKey(location.state.cols, location.state.rows);
+        const lKeyGridSize = utilsAppSpecific.getGridSizeKey(prefs.cols, prefs.rows);
 
-        const lTimesPlayed = utils.GetFromLocalStorage(consts.lclStrgKeyTimesPlayed);
+        const lGameStats = utils.GetFromLocalStorage(consts.lclStrgKeyGameStats);
 
-        if (!(location.state.blocks in lTimesPlayed))
+        if (!(prefs.blocks in lGameStats))
         {
-            lTimesPlayed[location.state.blocks] = { };
+            lGameStats[prefs.blocks] = { };
         }
 
-        // The number of times the user has played with the current game configuration.
-        let lTimesPlayedCurrentGame;
-
-        if (lKeyGridSize in lTimesPlayed[location.state.blocks])
-        {
-            lTimesPlayedCurrentGame = lTimesPlayed[location.state.blocks][lKeyGridSize];
+        if (lKeyGridSize in lGameStats[prefs.blocks])
+        { 
+            const lTimesPlayedCurrentGame = lGameStats[prefs.blocks][lKeyGridSize].timesPlayed; 
+            lGameStats[prefs.blocks][lKeyGridSize].timesPlayed = lTimesPlayedCurrentGame + 1;
         }
         else
         {
-            lTimesPlayedCurrentGame = 0;
-        }
-
-        // Increment the tally.
-        lTimesPlayed[location.state.blocks][lKeyGridSize] = lTimesPlayedCurrentGame + 1;
-
-        // Update the local stats object.
-        utils.SetInLocalStorage(consts.lclStrgKeyTimesPlayed, lTimesPlayed);
-
-        // The (local) high-scores object
-        const lHighScores = utils.GetFromLocalStorage(consts.lclStrgKeyHighScores);
-
-        if (!(location.state.blocks in lHighScores))
-        {
-            lHighScores[location.state.blocks] = { };
+            lGameStats[prefs.blocks][lKeyGridSize] = { };
+            lGameStats[prefs.blocks][lKeyGridSize].timesPlayed = 1;
         }
 
         // The current local high-score.
-        let lHighScoreLocal = getStat("highLocal");
-        if (!Number.isInteger(lHighScoreLocal))
-        { lHighScoreLocal = 0; }
+        const lHighScoreLocal = lGameStats[prefs.blocks][lKeyGridSize].score || 0;
 
-        // The score that the user just posted.
-        const lScoreNow = getStat("score");
+        // The number of line-clears associated with lHighScoreLocal.
+        const lLinesHighScoreLocal = lGameStats[prefs.blocks][lKeyGridSize].lines || 0;
 
-        if (lScoreNow > lHighScoreLocal)
+        if ( lScoreNow > lHighScoreLocal || 
+            (lScoreNow == lHighScoreLocal && lLinesNow < lLinesHighScoreLocal) )
         {
-            if (lKeyGridSize in lHighScores)
-            {
-                lHighScores[location.state.blocks][lKeyGridSize].score = lScoreNow;
-                lHighScores[location.state.blocks][lKeyGridSize].lines = getStat("lines");
-                lHighScores[location.state.blocks][lKeyGridSize].user = getStat("user");
-            }
-            else
-            {
-                lHighScores[location.state.blocks][lKeyGridSize] = { score: lScoreNow, lines: getStat("lines"), user: location.state.username };
-            }
+            lGameStats[prefs.blocks][lKeyGridSize].score = lScoreNow;
+            lGameStats[prefs.blocks][lKeyGridSize].lines = lLinesNow;
+            lGameStats[prefs.blocks][lKeyGridSize].user = lUserNow;
 
-            // Update the stats.
+            // Update the stats display.
             stats.current.content.rows.highScoreLocal.score = lScoreNow;
-            stats.current.content.rows.highScoreLocal.lines = getStat("lines");
-            stats.current.content.rows.highScoreLocal.user = location.state.username;
-
-            // Update the local stats object.
-            utils.SetInLocalStorage(consts.lclStrgKeyHighScores, lHighScores);
+            stats.current.content.rows.highScoreLocal.lines = lLinesNow;
+            stats.current.content.rows.highScoreLocal.user = lUserNow;
         }
 
-        // Check if the all-time high-score was beaten and update the database if so.
+        // Update the game stats object.
+        utils.SetInLocalStorage(consts.lclStrgKeyGameStats, lGameStats);
+
+        if (lIsSignedIn)
+        {
+            // Update global stats.
+            const lUpdateResponse = await ApiRequestor.updateStats(
+                {
+                    "blocks": prefs.blocks,
+                    "grid": lKeyGridSize,
+                    "score": lScoreNow,
+                    "lines": lLinesNow,
+                    "user": lUserNow
+                }
+            );
+            console.log(lUpdateResponse);
+
+            // Update the stats display with the updated global data.
+            if (lUpdateResponse)
+            {
+                stats.current.content.rows.highScoreGlobal.score = lUpdateResponse.score;
+                stats.current.content.rows.highScoreGlobal.lines = lUpdateResponse.lines;
+                stats.current.content.rows.highScoreGlobal.user = lUpdateResponse.user;
+            }
+        }
+
+        reRender();
     }
 
     const getStat = (pStat) =>
@@ -831,7 +856,7 @@ function Game()
 
     const resetNextBlocks = () =>
     {
-        const lBlocks = location.state.blocks.split('');
+        const lBlocks = prefs.blocks.split('');
 
         rfNextBlocks.current = [ ...Array(4) ].map(
             () =>
@@ -1002,7 +1027,7 @@ function Game()
                 prNextBlocks = { rfNextBlocks.current }
                 prGridHold = { lGridHold }
                 prGameInProgress = { rfGameInProgress.current }
-                prActiveBlocks = { location.state.blocks }
+                prActiveBlocks = { prefs.blocks }
                 prStats = { stats.current }
                 prHandlers = { lHandlers }
                 prButtonSymbols = { gridSymbols }
@@ -1019,7 +1044,7 @@ function Game()
                 prNextBlocks = { rfNextBlocks.current }
                 prGridHold = { lGridHold }
                 prGameInProgress = { rfGameInProgress.current }
-                prActiveBlocks = { location.state.blocks }
+                prActiveBlocks = { prefs.blocks }
                 prStats = { stats.current }
                 prHandlers = { lHandlers }
                 prButtonSymbols = { gridSymbols }
@@ -1032,12 +1057,12 @@ function Game()
 /*
 * The slowest/highest period at which the block falls (ms).
 */
-const gFallPeriodMax = 900;
+const gFallPeriodMax = 1000;
 
 /*
 * The fastest/lowest period at which the block falls (ms).
 */
-const gFallPeriodMin = 300;
+const gFallPeriodMin = 250;
 
 /*
 * The interval between consecutive block fall period (ms): e.g. the fall rate at level 4 will be 
@@ -1045,7 +1070,7 @@ const gFallPeriodMin = 300;
 * The difference between the max and min fall periods must be divisible by this value: i.e. 
   (s_fall_period_initial - s_fall_period_min) % s_fall_period_interval == 0 must be true.
 */
-const gFallPeriodInterval = 100;
+const gFallPeriodInterval = 125;
 
 /*
 * The period at which the block falls when the 'soft-drop' mode is active.

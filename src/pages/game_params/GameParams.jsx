@@ -15,12 +15,14 @@ import CountLabel from '../../components/count_label/CountLabel.jsx';
 import CheckBox from '../../components/check_box/CheckBox.jsx';
 import PageContainer from '../../components/page_container/PageContainer.jsx';
 import Container from '../../components/container/Container.jsx';
-import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
+import headerButtons from '../../components/header_buttons/HeaderButtons';
 import ThemeContext from "../../contexts/ThemeContext.js";
+import UserContext from '../../contexts/UserContext.js';
 import PreferenceContext from '../../contexts/PreferenceContext.js';
 import TextBlocks from '../../components/text_blocks/TextBlocks.jsx';
 import ButtonBlocks from '../../components/button_blocks/ButtonBlocks.jsx';
 import CountContainer from '../../components/count_container/CountContainer.jsx';
+import ApiRequestor from '../../ApiRequestor.js';
 
 const gRngCols = { min: 4, max: 10 };
 const gRngRows = { min: 5, max: 22 };
@@ -33,6 +35,8 @@ function GameParams()
 
     // The user's preferences and the function that handles updating it.
     const { prefs, updatePrefs } = useContext(PreferenceContext);
+
+    const lUserContext = useContext(UserContext);
 
     const navigate = useNavigate();
 
@@ -51,16 +55,14 @@ function GameParams()
                 orderRows: [ "highScoreGlobal", "highScoreLocal" ],
                 rows:
                 {
-                    highScoreGlobal: { title: "HI (G)", score: "-", lines: "-", user:  "-" },
-                    highScoreLocal: { title: "HI (L)", score: "-", lines: "-", user:  "-" },
+                    highScoreGlobal: { title: "HI - GLOBAL", score: "-", lines: "-", user:  "-" },
+                    highScoreLocal: { title: "HI - LOCAL", score: "-", lines: "-", user:  "-" },
                 }
             }
         }
     );
 
-    const [ timesPlayedLocal, setTimesPlayedLocal ] = useState(0);
-
-    const [ timesPlayedGlobal, setTimesPlayedGlobal ] = useState(0);
+    const [ stTimesPlayed, setTimesPlayed ] = useState({ local: 0, global: 0 });
 
     const [optionsPopUpMsg, setOptionsPopUpMsg] = useState(undefined);
 
@@ -125,28 +127,24 @@ function GameParams()
         setBlockList(lBlockListNew);
     }
 
-    const updateStats = () =>
+    const updateStats = async () =>
     {
-        const lHighScores = utils.GetFromLocalStorage(consts.lclStrgKeyHighScores);
-        const lTimesPlayedObject = utils.GetFromLocalStorage(consts.lclStrgKeyTimesPlayed);
+        const lGameStats = utils.GetFromLocalStorage(consts.lclStrgKeyGameStats);
+        console.log(lGameStats);
 
         const lKeyGridSize = utilsAppSpecific.getGridSizeKey(numColumns, numRows);
 
-        let lTimesPlayedLocal = 0;
-        let lHighScoreLocal = { score: "-", lines: "-", user: "-" };
-        let lHighScoreGlobal = { score: "-", lines: "-", user: "-" };
+        let lGameStatsLocal = { score: "-", lines: "-", user: "-", timesPlayed: 0 };
 
-        // Set local stats.
-        if (blockList in lHighScores && lKeyGridSize in lHighScores[blockList])
-        {
-            lHighScoreLocal.score = lHighScores[blockList][lKeyGridSize].score;
-            lHighScoreLocal.lines = lHighScores[blockList][lKeyGridSize].lines;
-            lHighScoreLocal.user = lHighScores[blockList][lKeyGridSize].user;
+        // Set local stats (if available).
+        if (blockList in lGameStats && lKeyGridSize in lGameStats[blockList])
+            lGameStatsLocal = lGameStats[blockList][lKeyGridSize];
 
-            lTimesPlayedLocal = lTimesPlayedObject[blockList][lKeyGridSize]
-        }
-        
         // Set global stats (if available).
+        let lGameStatsGlobal = await ApiRequestor.getGameStats({ "blocks": blockList, "grid": lKeyGridSize });
+
+        if (!lGameStatsGlobal)
+            lGameStatsGlobal = { score: "-", lines: "-", user: "-", timesPlayed: "-" };
 
         // Set state variables.
         setHighScores(
@@ -154,24 +152,27 @@ function GameParams()
             {
                 const lCopy = JSON.parse(JSON.stringify(prev));
 
-                lCopy.content.rows.highScoreLocal.score = lHighScoreLocal.score;
-                lCopy.content.rows.highScoreLocal.lines = lHighScoreLocal.lines;
-                lCopy.content.rows.highScoreLocal.user = lHighScoreLocal.user;
+                lCopy.content.rows.highScoreLocal.score = lGameStatsLocal.score;
+                lCopy.content.rows.highScoreLocal.lines = lGameStatsLocal.lines;
+                lCopy.content.rows.highScoreLocal.user = lGameStatsLocal.user;
 
-                lCopy.content.rows.highScoreGlobal.score = lHighScoreGlobal.score;
-                lCopy.content.rows.highScoreGlobal.lines = lHighScoreGlobal.lines;
-                lCopy.content.rows.highScoreGlobal.user = lHighScoreGlobal.user;
+                lCopy.content.rows.highScoreGlobal.score = lGameStatsGlobal.score;
+                lCopy.content.rows.highScoreGlobal.lines = lGameStatsGlobal.lines;
+                lCopy.content.rows.highScoreGlobal.user = lGameStatsGlobal.user;
 
                 return lCopy;
             }
         );
 
-        setTimesPlayedLocal(lTimesPlayedLocal);
+        setTimesPlayed({ local: lGameStatsLocal.timesPlayed, global: lGameStatsGlobal.timesPlayed });
     };
 
     const handleNext = () =>
     {
-        navigate("/username", { state: { rows: numRows, cols: numColumns, blocks: blockList } });
+        if (!lUserContext.value)
+        { navigate("/username"); return; } // { state: { rows: numRows, cols: numColumns, blocks: blockList } }
+
+        navigate("/game");
     };
 
     return ( 
@@ -179,8 +180,8 @@ function GameParams()
             navigate = { navigate }
             buttonNavBarText = "NEXT"
             buttonNavBarHandler = { handleNext }
-            optionsLeftHeaderButtons = { [ optionsHeaderButtons.back ] }
-            optionsRightHeaderButtons = { [ optionsHeaderButtons.settings ] }
+            headerBtnsLeft = { [ headerButtons.back ] }
+            headerBtnsRight = { [ headerButtons.settings ] }
             optionsPopUpMsg = { optionsPopUpMsg }
             style = { styles.container }
         >
@@ -305,14 +306,14 @@ function GameParams()
                         prStyleTable = {{ backgroundColor: theme.content }}
                         //prBorderColour = { theme.borders }
                         prBorderSize = { 3 }
-                        prStyleCellHeader = {{ backgroundColor: theme.buttonContent }}
-                        prStyleCellContent = {{ backgroundColor: theme.buttonContent }}
+                        prStyleCellHeader = {{ backgroundColor: theme.buttonContent, padding: 10 }}
+                        prStyleCellContent = {{ backgroundColor: theme.buttonContent, textAlign: "center", padding: 10 }}
                         //prStyleColumn = {{ backgroundColor: theme.content }}
                     />
 
-                    <CountLabel text = "Games (Local)" count = { timesPlayedLocal } style = { styles.countLabel } />
+                    <CountLabel text = "Games (Local)" count = { stTimesPlayed.local } style = { styles.countLabel } />
 
-                    <CountLabel text = "Games (Global)" count = { timesPlayedGlobal } style = { styles.countLabel } />
+                    <CountLabel text = "Games (Global)" count = { stTimesPlayed.global } style = { styles.countLabel } />
                 </Container>
 
                 {/* Display stats for this game, such as number of times played and high-score. */}
@@ -363,7 +364,10 @@ const styles =
     },
     conStats:
     {
-        rowGap: utilsGlobalStyles.spacingVertN(-1)
+        width: window.innerWidth > 500 ? 500 : globalProps.widthCon,
+        maxWidth: "100%",
+        rowGap: utilsGlobalStyles.spacingVertN(-1),
+        flexGrow: 0
     },
     tableHighScore:
     {

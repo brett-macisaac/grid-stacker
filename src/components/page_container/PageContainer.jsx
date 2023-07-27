@@ -20,15 +20,15 @@ import PopUpStandard from '../pop_up_standard/PopUpStandard.jsx';
     > navigate: the navigate object.
     > buttonNavBarText: the text of the NavBar button.
     > buttonNavBarHandler: the onPress function of the NavBar button.
-    > optionsLeftHeaderButtons: this prop is passed as the optionsLeftButtons of the page's Header component.
-    > optionsRightHeaderButtons: this prop is passed as the optionsRightButtons of the page's Header component.
+    > headerBtnsLeft: this prop is passed as the btnsLeft of the page's Header component.
+    > headerBtnsRight: this prop is passed as the btnsRight of the page's Header component.
     > optionsPopUpMsg: an object which defines the content of the pop-up message. If undefined/falsy (which it is by 
       default), a pop-up message isn't displayed. The properties of this object that are used are the props of the 
       PopUpStandard component.
     > style: an optional styling object for the container of the content.
 */
-function PageContainer({ children, navigate, showHeader, buttonNavBarText, buttonNavBarHandler, optionsLeftHeaderButtons, 
-                         optionsRightHeaderButtons, optionsPopUpMsg, style })
+function PageContainer({ children, navigate, showHeader, buttonNavBarText, buttonNavBarHandler, headerBtnsLeft, 
+                         headerBtnsRight, optionsPopUpMsg, style })
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -96,8 +96,8 @@ function PageContainer({ children, navigate, showHeader, buttonNavBarText, butto
                 showHeader && (
                     <Header 
                         navigate = { navigate }
-                        optionsLeftButtons = { optionsLeftHeaderButtons }
-                        optionsRightButtons = { optionsRightHeaderButtons }
+                        btnsLeft = { headerBtnsLeft }
+                        btnsRight = { headerBtnsRight }
                         setOptionsPopUpMsg = { setOptionsPopUpMsg }
                     />
                 )
@@ -130,21 +130,11 @@ PageContainer.propTypes =
     showHeader: PropTypes.bool,
     buttonNavBarText: PropTypes.string,
     buttonNavBarHandler: PropTypes.func,
-    optionsLeftHeaderButtons: PropTypes.arrayOf(
-        PropTypes.shape(
-            {
-                icon: PropTypes.func.isRequired,
-                onPress: PropTypes.func
-            }
-        )
+    headerBtnsLeft: PropTypes.arrayOf(
+        PropTypes.elementType
     ),
-    optionsRightHeaderButtons: PropTypes.arrayOf(
-        PropTypes.shape(
-            {
-                icon: PropTypes.func.isRequired,
-                onPress: PropTypes.func
-            }
-        )
+    headerBtnsRight:  PropTypes.arrayOf(
+        PropTypes.elementType
     ),
     optionsPopUpMsg: PropTypes.object,
     style: PropTypes.object,
