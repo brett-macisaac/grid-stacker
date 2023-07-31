@@ -156,7 +156,7 @@ function App()
     useEffect(
         () =>
         {
-            ApiRequestor.setAuthToken(user.token);
+            ApiRequestor.setAuthToken(user ? user.token : "");
         },
         [ user ]
     );

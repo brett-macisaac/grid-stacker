@@ -27,9 +27,9 @@ function SignUp()
 
     const lUserContext = useContext(UserContext);
 
-    const [ stUsername, setUsername ] = useState(location.state.username);
+    const [ stUsername, setUsername ] = useState(location.state ? location.state.username : "");
 
-    const [ stPassword, setPassword ] = useState(location.state.password);
+    const [ stPassword, setPassword ] = useState(location.state ? location.state.password : "");
 
     const [ stPasswordRenter, setPasswordRenter ] = useState("");
 

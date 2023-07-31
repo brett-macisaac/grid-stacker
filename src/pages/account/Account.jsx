@@ -57,7 +57,7 @@ function Account()
 
             <ButtonStandard 
                 text = "CHANGE ACCOUNT" isBold
-                onPress = { () => navigate("/signUp") } 
+                onPress = { () => navigate("/signIn") } 
                 style = { globalStyles.button }
             />
 
