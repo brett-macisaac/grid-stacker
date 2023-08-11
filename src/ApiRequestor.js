@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const gTesting = true;
+const gTesting = false;
 
 const gBaseURL = gTesting ? "http://localhost:5000/api/v1/" : "https://grid-stacker-api.onrender.com/api/v1/"; //https://grid-stacker-api.azurewebsites.net/api/v1/";
 

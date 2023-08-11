@@ -8,6 +8,7 @@ import ThemeContext from "../../contexts/ThemeContext.js";
 import globalProps, { utilsGlobalStyles } from '../../styles';
 import consts from '../../utils/constants';
 import utils from '../../utils/utils';
+import { StayPrimaryLandscapeRounded } from '@mui/icons-material';
 
 /*
 * An localStorage key whose value is an array of IDs (strings) which refer to the pop-up messages that can no longer
@@ -63,7 +64,7 @@ function PopUpStandard({ title, message, buttons, removePopUp, dismissable, id, 
         []
     );
 
-    const handlePressNeverShowAgain = async () =>
+    const handlePressNeverShowAgain = () =>
     {
         const isBlacklisted = blackList.includes(id);
 
@@ -84,12 +85,15 @@ function PopUpStandard({ title, message, buttons, removePopUp, dismissable, id, 
 
         setBlackList(blackListNew);
 
-        await utils.SetInLocalStorage(lclStrgKeyPopUpBlackList, blackListNew);
+        utils.SetInLocalStorage(lclStrgKeyPopUpBlackList, blackListNew);
     }
 
-    if (!(id ? (!blackList.includes(id) || blackListedByCheckBox) : true))
+    //const lDontShown = !(id ? (!blackList.includes(id) || blackListedByCheckBox) : true);
+    const lDontShown = id && (blackList.includes(id) && !blackListedByCheckBox);
+
+    if (lDontShown)
     {
-        return null;
+        return undefined;
     }
 
     return (
@@ -149,6 +153,7 @@ function PopUpStandard({ title, message, buttons, removePopUp, dismissable, id, 
                             text = "Never Show Again"
                             isChecked = { blackList.includes(id) }
                             onPress = { handlePressNeverShowAgain }
+                            style = { styles.checkbox }
                         />
                     )
                 }
@@ -214,6 +219,12 @@ const styles =
         width: "100%",
         maxWidth: 300,
         alignSelf: "center"
+    },
+    checkbox:
+    {
+        maxWidth: 300,
+        alignSelf: "center",
+        flexShrink: 0
     }
 };
 

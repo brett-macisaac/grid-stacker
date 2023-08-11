@@ -60,12 +60,12 @@ function SignIn()
             headerBtnsRight = { [ headerButtons.settings ] }
             style = { styles.container }
             optionsPopUpMsg = { stOptionsPopUpMsg }
-            buttonNavBarText = { "Sign In" }
+            buttonNavBarText = { "SIGN IN" }
             buttonNavBarHandler = { handleSignIn }
         >
 
             <TextBlocks 
-                prText = "Sign In" prSizeText = { 35 } 
+                prText = "SIGN IN" prSizeText = { 40 } 
                 prColourBackground = { theme.emptyGridCell } 
                 prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
             />

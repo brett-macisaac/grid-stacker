@@ -21,7 +21,7 @@ import utils from '../../utils/utils';
 import consts from '../../utils/constants';
 import ThemeContext from "../../contexts/ThemeContext.js";
 import UserContext from '../../contexts/UserContext';
-import { PopUpOk } from '../../components/pop_up_standard/PopUpStandard.jsx';
+import { lclStrgKeyPopUpBlackList } from '../../components/pop_up_standard/PopUpStandard.jsx';
 import utilsAppSpecific from '../../utils/utils_app_specific';
 
 function Menu({}) 
@@ -34,7 +34,9 @@ function Menu({})
 
     const navigate = useNavigate();
 
-    const [ stMetaStatsLocal, setMetaStatsLocal ] = useState(utils.GetFromLocalStorage(consts.lclStrgKeyMetaStats));
+    const [ stMetaStatsLocal, setMetaStatsLocal ] = useState(
+        utils.GetFromLocalStorage(consts.lclStrgKeyMetaStats, { totalGames: 0, totalScore: 0, totalLines: 0 })
+    );
 
     const [ stMetaStatsGlobal, setMetaStatsGlobal ] = useState(undefined);
 
@@ -42,7 +44,11 @@ function Menu({})
 
     const handlePlay = () =>
     {
-        if (!lUserContext.value)  // If the user isn't signed in.
+        // The list of pop-ups that are set to never show again.
+        const lPopUpBlacklist = utils.GetFromLocalStorage(lclStrgKeyPopUpBlackList, []);
+
+        // Show the pop-up if the user isn't signed-in or the pop-up is set to never show again.
+        if (!lUserContext.value && !lPopUpBlacklist.includes(gPopUpIdNotSignedIn))
         {
             setOptionsPopUpMsg(
                 {
@@ -52,11 +58,14 @@ function Menu({})
                         { text: "Continue as Guest", onPress: () => { navigate("/gameParams") } },
                         { text: "Sign In", onPress: () => { navigate("/signIn") } },
                         { text: "Create Account", onPress: () => { navigate("/signUp") } },
-                    ]
+                    ],
+                    id: gPopUpIdNotSignedIn,
+                    showNeverShowAgainCheckbox: true
                 }
             );
             return;
         }
+
         navigate("/gameParams");
     };
 
@@ -118,6 +127,12 @@ function Menu({})
             }
 
             {/* <TextBlocks 
+                prText = "!@#$%^&*(){}[]''<>?/\|`~,.+=-:;" prSizeText = { 50 } 
+                prColourBackground = { theme.emptyGridCell } 
+                prStyle = {{ ...styles.title, justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
+            /> */}
+
+            {/* <TextBlocks 
                 prText = "GS" prSizeText = { 300 } 
                 prColourBackground = { theme.emptyGridCell } 
                 prColourPattern = { [ utilsAppSpecific.getRandomBlockColour(), utilsAppSpecific.getRandomBlockColour() ] }
@@ -151,5 +166,8 @@ const styles =
         border: "none"
     },
 };
+
+// The ID of the pop-up that appears when not signed-in.
+const gPopUpIdNotSignedIn = "notSignedInMenu";
 
 export default Menu;

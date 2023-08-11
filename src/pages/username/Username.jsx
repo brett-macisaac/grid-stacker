@@ -19,6 +19,7 @@ import PreferenceContext from '../../contexts/PreferenceContext.js';
 import TextStandard from '../../components/text_standard/TextStandard';
 import TextInputStandard from '../../components/text_input_standard/TextInputStandard.jsx';
 import { PopUpOk } from '../../components/pop_up_standard/PopUpStandard.jsx'
+import headerButtons from '../../components/header_buttons/HeaderButtons';
 
 /*
 * A local storage key for all of the usernames that have been used in the past.
@@ -88,14 +89,14 @@ function Username()
             navigate = { navigate }
             buttonNavBarText = "PLAY"
             buttonNavBarHandler = { handlePlay }
-            optionsLeftHeaderButtons = { [ optionsHeaderButtons.back ] }
-            optionsRightHeaderButtons = { [ optionsHeaderButtons.settings ] }
+            headerBtnsLeft = { [ headerButtons.back ] }
+            headerBtnsRight = { [ headerButtons.settings ] }
             optionsPopUpMsg = { optionsPopUpMsg }
             style = { styles.container }
         >
             <TextBlocks 
                 prText = "USERNAME" 
-                prSizeText = { 35 } 
+                prSizeText = { 40 } 
                 prColourBackground = { theme.emptyGridCell } 
                 style = {{ justifyContent: "center" }} 
                 prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }}

@@ -68,12 +68,12 @@ function SignUp()
             headerBtnsRight = { [ headerButtons.settings ] }
             style = { styles.container }
             optionsPopUpMsg = { stOptionsPopUpMsg }
-            buttonNavBarText = { "Sign Up" }
+            buttonNavBarText = { "SIGN UP" }
             buttonNavBarHandler = { handleSignUp }
         >
 
             <TextBlocks 
-                prText = "Sign Up" prSizeText = { 35 } 
+                prText = "SIGN UP" prSizeText = { 40 } 
                 prColourBackground = { theme.emptyGridCell } 
                 prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
             />
