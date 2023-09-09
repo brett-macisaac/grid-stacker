@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import react from '@vitejs/plugin-react'
 
+const gTesting = false;
+
 // The content of the app's manifest file.
 const manifest = 
 {
@@ -21,7 +23,7 @@ const manifest =
             purpose: "any maskable"
         }
     ],
-    start_url: "https://www.grid-stacker.com/",
+    start_url: gTesting ? "http://localhost:5173/" : "https://www.grid-stacker.com/",
     display: "standalone",
     theme_color: "#000000",
     background_color: "#000000"

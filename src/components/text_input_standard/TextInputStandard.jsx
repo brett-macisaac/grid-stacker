@@ -87,8 +87,8 @@ function TextInputStandard({ text, size, isBold, placeholder, maxLength, onChang
                 ...style,
                 borderColor: theme.borders,
                 borderRadius: fontSize / 2,
-                paddingTop: fontSize / 2,
-                paddingBottom: fontSize / 2,
+                paddingTop: multiline ? fontSize : 0,
+                paddingBottom: multiline ? fontSize : 0,
                 maxHeight: maxHeight,
                 color: theme.font,
                 fontWeight: isBold ? globalProps.fontWeightBold : 'normal', 
@@ -131,6 +131,7 @@ function TextInputStandard({ text, size, isBold, placeholder, maxLength, onChang
                         style = {{ 
                             marginLeft: fontSize,
                             marginRight: isEyeShown ? 0 : fontSize,
+                            height: "3em",
                             flex: 1,
                             fontSize: fontSize,
                             ...styles.textElement,

@@ -214,12 +214,12 @@ const globalStyles =
     textBox:
     {
         width: "100%",
-        maxWidth: 300
+        maxWidth: 400
     },
     button:
     {
         width: "100%",
-        maxWidth: 300,
+        maxWidth: 400,
         padding: 15,
         borderRadius: globalProps.borderRadiusStandard
     }

@@ -43,7 +43,7 @@ function SignIn()
         if (!lResponseSignIn)
         { setOptionsPopUpMsg(PopUpOk("Connection Error", "Unable to connect to the server. Are you connected to the internet?" )); return; }
         else if ("error" in lResponseSignIn)
-        { setOptionsPopUpMsg(PopUpOk("Problem Found", lResponseSignIn.error)); return; }
+        { setOptionsPopUpMsg(PopUpOk(lResponseSignIn.error.title, lResponseSignIn.error.message)); return; }
 
         lUserContext.updater(lResponseSignIn);
 
@@ -60,8 +60,8 @@ function SignIn()
             headerBtnsRight = { [ headerButtons.settings ] }
             style = { styles.container }
             optionsPopUpMsg = { stOptionsPopUpMsg }
-            buttonNavBarText = { "SIGN IN" }
-            buttonNavBarHandler = { handleSignIn }
+            // buttonNavBarText = { "SIGN IN" }
+            // buttonNavBarHandler = { handleSignIn }
         >
 
             <TextBlocks 
@@ -70,38 +70,52 @@ function SignIn()
                 prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
             />
 
-            <TextStandard 
+            {/* <TextStandard 
                 text = "Enter your username and password below to sign in." isItalic
                 style = { styles.text } 
-            />
+            /> */}
 
-            <TextInputStandard 
-                text = { stUsername } 
-                placeholder = { "Username" } 
-                style = { globalStyles.textBox }
-                maxLength = { consts.maxLengthName } 
-                onChangeText = { (pNewText) => setUsername(pNewText) }
-            />
+            <div style = { styles.conContent }>
 
-            <TextInputStandard 
-                text = { stPassword } 
-                placeholder = { "Password" } 
-                style = { globalStyles.textBox }
-                maxLength = { consts.maxLengthPassword } 
-                onChangeText = { (pNewText) => setPassword(pNewText) }
-                secureTextEntry
-            />
+                <div style = { styles.conText }>
+                    <TextInputStandard 
+                        text = { stUsername } 
+                        placeholder = { "Username" } 
+                        style = { globalStyles.textBox }
+                        maxLength = { consts.maxLengthUsername } 
+                        onChangeText = { (pNewText) => setUsername(pNewText) }
+                    />
 
-            <TextStandard 
-                text = "OR" size = { 1 } isBold
-                style = { styles.text } 
-            />
+                    <TextInputStandard 
+                        text = { stPassword } 
+                        placeholder = { "Password" } 
+                        style = { globalStyles.textBox }
+                        maxLength = { consts.maxLengthPassword } 
+                        onChangeText = { (pNewText) => setPassword(pNewText) }
+                        secureTextEntry
+                    />
+                </div>
 
-            <ButtonStandard 
-                text = "CREATE ACCOUNT" isBold
-                onPress = { () => navigate("/signUp", { state: { username: stUsername, password: stPassword } }) } 
-                style = { globalStyles.button }
-            />
+                <div style = { styles.conButtons }>
+                    <ButtonStandard 
+                        text = "SIGN IN" isBold
+                        onPress = { handleSignIn } 
+                        style = { globalStyles.button }
+                    />
+
+                    <TextStandard 
+                        text = "OR" size = { 1 } isBold
+                        style = { styles.text } 
+                    />
+
+                    <ButtonStandard 
+                        text = "CREATE ACCOUNT" isBold
+                        onPress = { () => navigate("/signUp", { state: { username: stUsername, password: stPassword } }) } 
+                        style = { globalStyles.button }
+                    />
+                </div>
+
+            </div>
 
         </PageContainer>
     );
@@ -130,12 +144,25 @@ const styles =
     {
         textAlign: "center",
     },
-    btnCreateAccount: 
+    conContent:
+    {
+        flex: 1,
+        rowGap: utilsGlobalStyles.spacingVertN(2),
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%"
+    },
+    conText: 
     {
         width: "100%",
-        maxWidth: 400,
-        padding: 15,
-        borderRadius: globalProps.borderRadiusStandard
+        alignItems: "center",
+        rowGap: utilsGlobalStyles.spacingVertN(),
+    },
+    conButtons:
+    {
+        width: "100%",
+        alignItems: "center",
+        rowGap: utilsGlobalStyles.spacingVertN(),
     }
 };
 

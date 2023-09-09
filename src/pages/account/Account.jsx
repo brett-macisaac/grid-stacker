@@ -49,23 +49,25 @@ function Account()
                 prStyle = {{ justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
             />
 
-            <ButtonStandard 
-                text = "LOG OUT" isBold
-                onPress = { handleLogOut } 
-                style = { globalStyles.button }
-            />
+            <div style = { styles.conContent }>
+                <ButtonStandard 
+                    text = "LOG OUT" isBold sizeText = { 1 }
+                    onPress = { handleLogOut } 
+                    style = { globalStyles.button }
+                />
 
-            <ButtonStandard 
-                text = "CHANGE ACCOUNT" isBold
-                onPress = { () => navigate("/signIn") } 
-                style = { globalStyles.button }
-            />
+                <ButtonStandard 
+                    text = "CHANGE ACCOUNT" isBold  sizeText = { 1 }
+                    onPress = { () => navigate("/signIn") } 
+                    style = { globalStyles.button }
+                />
 
-            <ButtonStandard 
-                text = "PLAY" isBold
-                onPress = { () => navigate("/gameParams") } 
-                style = { globalStyles.button }
-            />
+                <ButtonStandard 
+                    text = "PLAY" isBold  sizeText = { 1 }
+                    onPress = { () => navigate("/gameParams") } 
+                    style = { globalStyles.button }
+                />
+            </div>
 
         </PageContainer>
     );
@@ -75,14 +77,9 @@ const styles =
 {
     container:
     {
-        rowGap: utilsGlobalStyles.spacingVertN(),
+        //rowGap: utilsGlobalStyles.spacingVertN(),
         paddingLeft: utilsGlobalStyles.spacingVertN(-2),
         paddingRight: utilsGlobalStyles.spacingVertN(-2),
-    },
-    conButtonTheme:
-    {
-        alignItems: "center",
-        // justifyContent: "center"
     },
     conSFX:
     {
@@ -93,6 +90,14 @@ const styles =
     text:
     {
         textAlign: "center",
+    },
+    conContent:
+    {
+        flex: 1,
+        rowGap: utilsGlobalStyles.spacingVertN(1),
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%"
     },
 };
 

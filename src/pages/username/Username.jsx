@@ -73,6 +73,11 @@ function Username()
             setOptionsPopUpMsg(PopUpOk("No Username", "You must enter a guest username to play."));
             return;
         }
+        else if (username.replace(/\s+/g, '').length == 0)
+        {
+            setOptionsPopUpMsg(PopUpOk("Invalid Username", "Your username must have at least one non-space character."));
+            return
+        }
 
         const lIsNewUser = !prevPlayers.includes(username);
 

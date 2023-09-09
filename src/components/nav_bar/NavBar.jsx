@@ -31,16 +31,18 @@ const styles =
         justifyContent: "center",
         //height: globalProps.heightNavBar,
         borderTop: "1px solid",
-        width: "100%"
+        width: "100%",
+        paddingTop: 15,
+        paddingBottom: 15,
     },
     button:
     {
         width: "80%",
         maxWidth: 500,
         alignItems: "center",
-        padding: 10,
-        marginTop: utilsGlobalStyles.spacingVertN(-2),
-        marginBottom: utilsGlobalStyles.spacingVertN(-2),
+        padding: 15,
+        // marginTop: utilsGlobalStyles.spacingVertN(-2),
+        // marginBottom: utilsGlobalStyles.spacingVertN(-2),
         borderRadius: globalProps.borderRadiusStandard,
     },
 };

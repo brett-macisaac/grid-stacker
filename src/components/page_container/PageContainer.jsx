@@ -164,10 +164,10 @@ const styles =
         flexDirection: "column",
         alignItems: "center",
         overflowY: "scroll",
-        paddingTop: utilsGlobalStyles.spacingVertN(-1),
-        paddingBottom: utilsGlobalStyles.spacingVertN(-1),
-        paddingLeft: utilsGlobalStyles.spacingVertN(-2),
-        paddingRight: utilsGlobalStyles.spacingVertN(-2),
+        paddingTop: utilsGlobalStyles.spacingVertN(),
+        paddingBottom: utilsGlobalStyles.spacingVertN(),
+        paddingLeft: utilsGlobalStyles.spacingVertN(-1),
+        paddingRight: utilsGlobalStyles.spacingVertN(-1),
         width: "100%"
     }
 }

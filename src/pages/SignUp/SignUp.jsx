@@ -54,7 +54,7 @@ function SignUp()
         if (!lResponseSignUp)
             { setOptionsPopUpMsg(PopUpOk("Connection Error", "Unable to connect to the server. Are you connected to the internet?" )); return; }
         else if ("error" in lResponseSignUp)
-            { setOptionsPopUpMsg(PopUpOk("Problem Found", lResponseSignUp.error)); return; }
+            { setOptionsPopUpMsg(PopUpOk(lResponseSignUp.error.title, lResponseSignUp.error.message)); return; }
 
         lUserContext.updater(lResponseSignUp);
 

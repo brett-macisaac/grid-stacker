@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const gTesting = false;
+const gTesting = true;
 
 const gBaseURL = gTesting ? "http://localhost:5000/api/v1/" : "https://grid-stacker-api.onrender.com/api/v1/"; //https://grid-stacker-api.azurewebsites.net/api/v1/";
 
@@ -12,7 +12,7 @@ class ApiRequestor
             headers: {
                 "Content-Type": "application/json"
             },
-            timeout: 1500,
+            timeout: 5000,
             validateStatus: () => true
         }
     );

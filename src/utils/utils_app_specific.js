@@ -1,5 +1,6 @@
 import Block from "../classes/Block";
 import utils from "./utils";
+import consts from "./constants";
 
 /*
 * Returns a key used to index an object whose keys represent the grid size. One such object is the one that stores the
