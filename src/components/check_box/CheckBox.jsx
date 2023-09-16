@@ -13,17 +13,17 @@ function CheckBox({ text, isChecked, onPress, monospaceFont, style })
     let theme = globalProps.themes[themeName];
 
     return (
-        <div style = {{ ...styles.conOuter, ...style, backgroundColor: theme.header }} onClick = { onPress }>
+        <div style = {{ ...styles.conOuter, backgroundColor: "transparent", border: `1px solid ${theme.borders}`, ...style }} onClick = { onPress }>
 
             <div className = "hideScrollBar" style = { styles.conText }>
                 <TextStandard text = { text } isBold = { true } isMonospace = { monospaceFont } />
             </div>
 
-            <div style = { { ...styles.check, backgroundColor: isChecked ? theme.selected : theme.font } }>
+            <div style = { { ...styles.check, backgroundColor: isChecked ? theme.header : theme.borders } }>
                 {
                     isChecked && (
                         <Done 
-                            sx = { { color: "#ffffff", fontSize: 2 * globalProps.fontSizeBase } }
+                            sx = { { fill: theme.borders, fontSize: 2 * globalProps.fontSizeBase } }
                         />
                     )
                 }
@@ -60,13 +60,13 @@ const styles =
         paddingBottom: 0.4 * globalProps.fontSizeBase,
         paddingLeft: 0.75 * globalProps.fontSizeBase,
         paddingRight: 0.75 * globalProps.fontSizeBase,
-        borderRadius: globalProps.borderRadiusStandard
+        borderRadius: globalProps.borderRadiusStandard,
     },
 
     conText:
     {
         marginRight: globalProps.fontSizeBase,
-        overflowX: "scroll"
+        overflowX: "scroll",
     },
 
     check:

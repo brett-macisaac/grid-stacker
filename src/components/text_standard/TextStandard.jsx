@@ -21,7 +21,8 @@ import globalProps, { utilsGlobalStyles } from '../../styles';
     > removeLineBreaks: a boolean that, when true, indicates that linebreaks should be removed before rendering the 
       text.
 */
-function TextStandard({ text, size, isBold, isMonospace, isItalic, style, removeLineBreaks })
+function TextStandard({ text, size, isBold, isMonospace, isItalic, style, removeLineBreaks, isVertical,
+                        className, prRef })
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -40,9 +41,13 @@ function TextStandard({ text, size, isBold, isMonospace, isItalic, style, remove
                 fontWeight: isBold ? globalProps.fontWeightBold : 'normal', 
                 fontSize: utilsGlobalStyles.fontSizeN(size),
                 fontFamily: isMonospace ? globalProps.fontFamilyMono : "",
-                fontStyle: isItalic ? "italic" : "normal"
+                fontStyle: isItalic ? "italic" : "normal",
+                writingMode: isVertical ? "vertical-lr" : "horizontal-tb",
+                textOrientation: isVertical ? "upright" : "",
+                letterSpacing: isVertical ? 4 : "normal"
             }} 
-            className = "unselectable"
+            className = { "unselectable " + className }
+            ref = { prRef }
         >
             { text }
         </div>
@@ -55,7 +60,13 @@ TextStandard.propTypes =
     size: PropTypes.number,
     isBold: PropTypes.bool,
     style: PropTypes.object,
-    removeLineBreaks: PropTypes.bool
+    removeLineBreaks: PropTypes.bool,
+    prIsVertical: PropTypes.bool,
+    prClassName: PropTypes.string,
+    prRef: PropTypes.oneOfType([
+        PropTypes.func, 
+        PropTypes.shape({ current: PropTypes.any })
+    ])
 };
 
 TextStandard.defaultProps =
@@ -63,7 +74,10 @@ TextStandard.defaultProps =
     size: 0,
     isBold: false,
     style: {},
-    removeLineBreaks: false
+    removeLineBreaks: false,
+    prRemoveLineBreaks: false,
+    prIsVertical: false,
+    prClassName: ""
 }
 
 export default TextStandard;

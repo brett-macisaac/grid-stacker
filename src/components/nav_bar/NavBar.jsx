@@ -15,9 +15,9 @@ function NavBar({ text, onPress })
             <ButtonBlocks 
                 text = { text }
                 onPress = { onPress }
-                style = {{ ...styles.button, backgroundColor: theme.buttonNavBar, borderColor: theme.borders }}
-                prColourBackground = { theme.buttonNavBar }
-                prColourEmptyCell = { theme.buttonNavBar }
+                style = {{ ...styles.button, backgroundColor: theme.header, borderColor: theme.borders, border: `1px solid ${theme.borders}` }}
+                prColourBackground = { theme.header }
+                prColourEmptyCell = { theme.header }
             />
         </div>
     );
@@ -32,8 +32,8 @@ const styles =
         //height: globalProps.heightNavBar,
         borderTop: "1px solid",
         width: "100%",
-        paddingTop: 15,
-        paddingBottom: 15,
+        paddingTop: 20,
+        paddingBottom: 20,
     },
     button:
     {

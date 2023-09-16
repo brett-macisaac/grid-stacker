@@ -49,7 +49,7 @@ function Settings()
                 isBold
                 icon = { 
                     <Brightness4 
-                        sx = {{ color: theme.fontButtonContent, fontSize: globalProps.sizeIconHeaderFooter }}
+                        sx = {{ fill: theme.borders, fontSize: globalProps.sizeIconHeaderFooter }}
                     /> 
                 }
                 onPress = { () => navigate("/settingsThemes") }
@@ -61,7 +61,7 @@ function Settings()
                 isBold
                 icon = { 
                     <Info 
-                        sx = {{ color: theme.fontButtonContent, fontSize: globalProps.sizeIconHeaderFooter }} 
+                        sx = {{ fill: theme.borders, fontSize: globalProps.sizeIconHeaderFooter }} 
                     /> 
                 }
                 onPress = { () => navigate("/about") }
@@ -73,7 +73,7 @@ function Settings()
                 isBold
                 icon = { 
                     <SportsEsports 
-                        sx = {{ color: theme.fontButtonContent, fontSize: globalProps.sizeIconHeaderFooter }} 
+                        sx = {{ fill: theme.borders, fontSize: globalProps.sizeIconHeaderFooter }} 
                     /> 
                 }
                 onPress = { () => navigate("/controls") }

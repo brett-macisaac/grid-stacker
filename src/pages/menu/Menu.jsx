@@ -104,40 +104,40 @@ function Menu({})
                 prStyle = {{ ...styles.title, justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
             />
 
-            <Container style = { styles.conGameCount }>
-                <TextStandard text = "Local Stats" isItalic isBold size = {1} />
-                <CountLabel text = "Games Played" count = { stMetaStatsLocal.totalGames } style = { styles.countLabel } />
+            <div style = { styles.content }>
+                <Container style = { styles.conGameCount } title = "Local Stats" >
+                    <CountLabel text = "Games Played" count = { stMetaStatsLocal.totalGames } style = { styles.countLabel } />
 
-                <CountLabel text = "Total Score" count = { stMetaStatsLocal.totalScore } style = { styles.countLabel } />
+                    <CountLabel text = "Total Score" count = { stMetaStatsLocal.totalScore } style = { styles.countLabel } />
 
-                <CountLabel text = "Total Lines" count = { stMetaStatsLocal.totalLines } style = { styles.countLabel } />
-            </Container>
+                    <CountLabel text = "Total Lines" count = { stMetaStatsLocal.totalLines } style = { styles.countLabel } />
+                </Container>
 
-            {
-                stMetaStatsGlobal && (
-                    <Container style = { styles.conGameCount }>
-                        <TextStandard text = "Global Stats" isItalic isBold size = {1} />
-                        <CountLabel text = "Games Played" count = { stMetaStatsGlobal.totalGames } style = { styles.countLabel } />
-        
-                        <CountLabel text = "Total Score" count = { stMetaStatsGlobal.totalScore } style = { styles.countLabel } />
-        
-                        <CountLabel text = "Total Lines" count = { stMetaStatsGlobal.totalLines } style = { styles.countLabel } />
-                    </Container>
-                )
-            }
+                {
+                    stMetaStatsGlobal && (
+                        <Container style = { styles.conGameCount } title = { "Global Stats" }>
+                            <CountLabel text = "Games Played" count = { stMetaStatsGlobal.totalGames } style = { styles.countLabel } />
+            
+                            <CountLabel text = "Total Score" count = { stMetaStatsGlobal.totalScore } style = { styles.countLabel } />
+            
+                            <CountLabel text = "Total Lines" count = { stMetaStatsGlobal.totalLines } style = { styles.countLabel } />
+                        </Container>
+                    )
+                }
 
-            {/* <TextBlocks 
-                prText = "!@#$%^&*(){}[]''<>?/\|`~,.+=-:;" prSizeText = { 50 } 
-                prColourBackground = { theme.emptyGridCell } 
-                prStyle = {{ ...styles.title, justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
-            /> */}
+                {/* <TextBlocks 
+                    prText = "!@#$%^&*(){}[]''<>?/\|`~,.+=-:;" prSizeText = { 50 } 
+                    prColourBackground = { theme.emptyGridCell } 
+                    prStyle = {{ ...styles.title, justifyContent: "center", backgroundColor: theme.emptyGridCell, padding: 10 }} 
+                /> */}
 
-            {/* <TextBlocks 
-                prText = "GS" prSizeText = { 300 } 
-                prColourBackground = { theme.emptyGridCell } 
-                prColourPattern = { [ utilsAppSpecific.getRandomBlockColour(), utilsAppSpecific.getRandomBlockColour() ] }
-                prStyle = {{ ...styles.title, justifyContent: "center", alignItems: "center", backgroundColor: theme.emptyGridCell, width: 600, height: 600, flexShrink: 0 }} 
-            /> */}
+                {/* <TextBlocks 
+                    prText = "GS" prSizeText = { 300 } 
+                    prColourBackground = { theme.emptyGridCell } 
+                    prColourPattern = { [ utilsAppSpecific.getRandomBlockColour(), utilsAppSpecific.getRandomBlockColour() ] }
+                    prStyle = {{ ...styles.title, justifyContent: "center", alignItems: "center", backgroundColor: theme.emptyGridCell, width: 600, height: 600, flexShrink: 0 }} 
+                /> */}
+            </div>
 
         </PageContainer>
     );
@@ -145,20 +145,25 @@ function Menu({})
 
 const styles = 
 {
-    title:
-    {
-        //marginBottom: utilsGlobalStyles.spacingVertN(1)
-    },
     container:
     {
         //justifyContent: "space-between", 
         rowGap: utilsGlobalStyles.spacingVertN(1),
         alignItems: "center",
     },
+    content:
+    {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        columnGap: utilsGlobalStyles.spacingVertN(2),
+        rowGap: utilsGlobalStyles.spacingVertN(0),
+        justifyContent: "center",
+        alignItems: "center"
+    },
     conGameCount:
     {
         rowGap: utilsGlobalStyles.spacingVertN(-2),
-        width: "100%",
+        // width: "100%",
         maxWidth: 500
     },
     countLabel: 

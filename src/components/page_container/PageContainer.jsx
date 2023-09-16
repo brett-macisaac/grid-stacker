@@ -163,6 +163,7 @@ const styles =
         flexGrow: 1,
         flexDirection: "column",
         alignItems: "center",
+        overflowX: "hidden",
         overflowY: "scroll",
         paddingTop: utilsGlobalStyles.spacingVertN(),
         paddingBottom: utilsGlobalStyles.spacingVertN(),

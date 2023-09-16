@@ -64,7 +64,7 @@ function ButtonNextPage({ icon, text, sizeText, isBold, backgroundColorIcon, onP
             </div>
 
             <ChevronRight 
-                sx = {{ color: theme.fontButtonContent, fontSize: globalProps.sizeIconHeaderFooter }}
+                sx = {{ fill: theme.borders, fontSize: globalProps.sizeIconHeaderFooter }}
             />
         </div>
     );

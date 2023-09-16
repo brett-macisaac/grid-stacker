@@ -19,7 +19,7 @@ function AccountHdrBtn({ prNavigate })
                 {
                     return (
                         <Person 
-                            sx = { { color: colour, fontSize: size } }
+                            sx = { { fill: colour, fontSize: size } }
                         />
                     )
                 } 

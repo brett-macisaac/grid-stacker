@@ -16,7 +16,7 @@ function SettingsHdrBtn({ prNavigate })
                 {
                     return (
                         <Settings 
-                            sx = { { color: colour, fontSize: size } }
+                            sx = { { fill: colour, fontSize: size } }
                         />
                     )
                 } 

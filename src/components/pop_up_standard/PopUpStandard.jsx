@@ -8,7 +8,6 @@ import ThemeContext from "../../contexts/ThemeContext.js";
 import globalProps, { utilsGlobalStyles } from '../../styles';
 import consts from '../../utils/constants';
 import utils from '../../utils/utils';
-import { StayPrimaryLandscapeRounded } from '@mui/icons-material';
 
 /*
 * An localStorage key whose value is an array of IDs (strings) which refer to the pop-up messages that can no longer
@@ -120,6 +119,10 @@ function PopUpStandard({ title, message, buttons, removePopUp, dismissable, id, 
                 {/* Message */}
                 <TextStandard text = { message } />
 
+                {/* <div>
+
+                </div> */}
+
                 {/* Buttons */}
                 {
                     buttons.map(
@@ -153,7 +156,7 @@ function PopUpStandard({ title, message, buttons, removePopUp, dismissable, id, 
                             text = "Never Show Again"
                             isChecked = { blackList.includes(id) }
                             onPress = { handlePressNeverShowAgain }
-                            style = { styles.checkbox }
+                            style = {{ ...styles.checkbox, border: `1px solid ${theme.borders}` }}
                         />
                     )
                 }
@@ -222,9 +225,11 @@ const styles =
     },
     checkbox:
     {
+        width: "100%",
         maxWidth: 300,
         alignSelf: "center",
-        flexShrink: 0
+        backgroundColor: "transparent"
+        // flexShrink: 0
     }
 };
 

@@ -16,7 +16,7 @@ function BackHdrBtn({ prNavigate })
                 {
                     return (
                         <ArrowBackIosNew 
-                            sx = { { color: colour, fontSize: size } }
+                            sx = { { fill: colour, fontSize: size } }
                         />
                     )
                 } 

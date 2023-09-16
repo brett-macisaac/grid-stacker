@@ -155,7 +155,7 @@ give you access to all controls, allowing for a comfortable and effective experi
                 />
                 <TextStandard 
                     text = {
-`You get to decide how big the grid is, with over 100 unique grid sizes. No longer are you forced
+`You get to decide how big the grid is, with over 100 unique grid sizes. No longer are you forced 
 to play on a 10x20 grid.`
                     }
                     style = { styles.paragraph }
@@ -183,7 +183,7 @@ in over 16,000 unique game modes.`
                     text = {
 `With most games in this genre, the blocks spawn above the grid, out-of-sight from the user, and proceed to 'fall' onto 
 the grid. With Grid Stacker, the blocks spawn directly onto the grid; moreover, rather than spawning in static 
-locations, the blocks can spawn anywhere in the top-two mrows, which makes playing on smaller grid sizes significantly 
+locations, the blocks can spawn anywhere in the top-three rows, which makes playing on smaller grid sizes significantly 
 more manageable.`
                     }
                     style = { styles.paragraph }
@@ -222,7 +222,7 @@ obscenely-colourful vomit spewed across your screen.`
                 />
                 <TextStandard 
                     text = {
-`Grid Stacker is PWA (Progressive Web App), meaning that it can be installed to your device and played offline.`
+`Grid Stacker is a PWA (Progressive Web App), meaning that it can be installed to your device and played offline.`
                     }
                     style = { styles.paragraph }
                 />

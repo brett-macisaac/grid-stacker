@@ -14,7 +14,7 @@ const optionsHeaderButtons =
         {
             return (
                 <ArrowBackIosNew 
-                    sx = { { color: colour, fontSize: size } }
+                    sx = { { fill: colour, fontSize: size } }
                 />
             )
         },
@@ -30,7 +30,7 @@ const optionsHeaderButtons =
         {
             return (
                 <Settings 
-                    sx = { { color: colour, fontSize: size } }
+                    sx = { { fill: colour, fontSize: size } }
                 />
             )
         },

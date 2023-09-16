@@ -46,18 +46,19 @@ function App()
     // Global window size variable.
     const [ windowSize, setWindowSize ] = useState({ width: window.innerWidth, height: window.innerHeight });
 
-    const updatePrefs = (pPrefPropKey, pPrefPropValue) =>
+    const updatePrefs = (pNewPrefs) =>
     {
-        //console.log("Updating preference: " + pPrefPropKey);
-        if (!prefs.hasOwnProperty(pPrefPropKey))
+        if (typeof pNewPrefs !== 'object')
         {
-            console.log("Invalid preference property!");
+            console.log("The argument must be an object containing the preferences you wish to update.");
             return;
         }
 
-        const lPrefsNew = { ...prefs, [pPrefPropKey]: pPrefPropValue }
+        const lPrefsNew = { ...prefs, ...pNewPrefs };
 
         setPrefs(lPrefsNew);
+
+        console.log(lPrefsNew);
 
         utils.SetInLocalStorage(consts.lclStrgKeyPreferences, lPrefsNew);
     };

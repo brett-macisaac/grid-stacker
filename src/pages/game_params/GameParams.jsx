@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useMemo, useCallback } from 'react';
 import { json, useNavigate } from 'react-router-dom';
+import _debounce from "lodash/debounce";
+import ClearIcon from '@mui/icons-material/Clear';
 
 import globalProps, { utilsGlobalStyles } from "../../styles.js";
 import consts from '../../utils/constants.js';
@@ -22,10 +24,14 @@ import PreferenceContext from '../../contexts/PreferenceContext.js';
 import TextBlocks from '../../components/text_blocks/TextBlocks.jsx';
 import ButtonBlocks from '../../components/button_blocks/ButtonBlocks.jsx';
 import CountContainer from '../../components/count_container/CountContainer.jsx';
+import SliderStandard from '../../components/slider_standard/SliderStandard.jsx';
 import ApiRequestor from '../../ApiRequestor.js';
 
 const gRngCols = { min: 4, max: 10 };
 const gRngRows = { min: 5, max: 22 };
+
+// https://dmitripavlutin.com/react-throttle-debounce/
+// https://dmitripavlutin.com/react-cleanup-async-effects/
 
 function GameParams() 
 {
@@ -66,33 +72,87 @@ function GameParams()
 
     const [optionsPopUpMsg, setOptionsPopUpMsg] = useState(undefined);
 
+    const statUpdateCounts = useRef(0);
+
+    const debouncedHandler = useMemo(
+        () => _debounce(async (asyncCallback) => await asyncCallback(), 500),
+        []
+    );
+
     useEffect(
         () =>
         {
-            // Initialise the grid.
-            // gGrid = new Grid(location.state.cols, location.state.rows);
-            // updateGridState();
-
-            updateStats();
-
-            // Get global (i.e. all-time) high-score for the current dimensions (if connection is possible and the returned value isn't 0).
+            updateStatsDebounced(numColumns, numRows, blockList);
         },
         [ numColumns, numRows, blockList ]
     );
 
-    const selectColumns = (pNumCols) =>
-    {
-        setNumColumns(pNumCols);
+    useEffect(
+        () =>
+        {
+            return () => 
+            {
+                // Cleanup of the debounced update.
+                updateStatsDebounced.cancel();
+            }
+        },
+        []
+    )
 
-        updatePrefs("cols", pNumCols);
-    };
+    const updateStatsDebounced = useMemo(
+        () =>
+        {
+            return _debounce(
+                async (numColumns, numRows, blockList) =>
+                {
+                    console.log("Stats Update #" + ++(statUpdateCounts.current));
 
-    const selectRows = (pNumRows) =>
-    {
-        setNumRows(pNumRows);
+                    const lGameStats = utils.GetFromLocalStorage(consts.lclStrgKeyGameStats);
+                    //console.log(lGameStats);
 
-        updatePrefs("rows", pNumRows);
-    };
+                    console.log(`${numRows}X${numColumns}`);
+
+                    const lKeyGridSize = utilsAppSpecific.getGridSizeKey(numColumns, numRows);
+
+                    let lGameStatsLocal = { score: "-", lines: "-", user: "-", timesPlayed: 0 };
+
+                    // Set local stats (if available).
+                    if (blockList in lGameStats && lKeyGridSize in lGameStats[blockList])
+                        lGameStatsLocal = lGameStats[blockList][lKeyGridSize];
+
+                    updatePrefs({ rows: numRows, cols: numColumns, blocks: blockList });
+
+                    // Set global stats (if available).
+                    let lGameStatsGlobal = await ApiRequestor.getGameStats({ "blocks": blockList, "grid": lKeyGridSize });
+
+                    if (!lGameStatsGlobal)
+                        lGameStatsGlobal = { score: "-", lines: "-", user: "-", timesPlayed: "-" };
+
+                    // Set state variables.
+                    setHighScores(
+                        (prev) =>
+                        {
+                            const lCopy = JSON.parse(JSON.stringify(prev));
+
+                            lCopy.content.rows.highScoreLocal.score = lGameStatsLocal.score;
+                            lCopy.content.rows.highScoreLocal.lines = lGameStatsLocal.lines;
+                            lCopy.content.rows.highScoreLocal.user = lGameStatsLocal.user;
+
+                            lCopy.content.rows.highScoreGlobal.score = lGameStatsGlobal.score;
+                            lCopy.content.rows.highScoreGlobal.lines = lGameStatsGlobal.lines;
+                            lCopy.content.rows.highScoreGlobal.user = lGameStatsGlobal.user;
+
+                            return lCopy;
+                        }
+                    );
+
+                    setTimesPlayed({ local: lGameStatsLocal.timesPlayed, global: lGameStatsGlobal.timesPlayed });
+                },
+                750
+            )
+        }, 
+        []
+    );
 
     const toggleBlock = (pBlockType) =>
     {
@@ -122,50 +182,8 @@ function GameParams()
 
         const lBlockListNew = lBlockList.join('');
 
-        updatePrefs("blocks", lBlockListNew);
-
         setBlockList(lBlockListNew);
     }
-
-    const updateStats = async () =>
-    {
-        const lGameStats = utils.GetFromLocalStorage(consts.lclStrgKeyGameStats);
-        console.log(lGameStats);
-
-        const lKeyGridSize = utilsAppSpecific.getGridSizeKey(numColumns, numRows);
-
-        let lGameStatsLocal = { score: "-", lines: "-", user: "-", timesPlayed: 0 };
-
-        // Set local stats (if available).
-        if (blockList in lGameStats && lKeyGridSize in lGameStats[blockList])
-            lGameStatsLocal = lGameStats[blockList][lKeyGridSize];
-
-        // Set global stats (if available).
-        let lGameStatsGlobal = await ApiRequestor.getGameStats({ "blocks": blockList, "grid": lKeyGridSize });
-
-        if (!lGameStatsGlobal)
-            lGameStatsGlobal = { score: "-", lines: "-", user: "-", timesPlayed: "-" };
-
-        // Set state variables.
-        setHighScores(
-            (prev) =>
-            {
-                const lCopy = JSON.parse(JSON.stringify(prev));
-
-                lCopy.content.rows.highScoreLocal.score = lGameStatsLocal.score;
-                lCopy.content.rows.highScoreLocal.lines = lGameStatsLocal.lines;
-                lCopy.content.rows.highScoreLocal.user = lGameStatsLocal.user;
-
-                lCopy.content.rows.highScoreGlobal.score = lGameStatsGlobal.score;
-                lCopy.content.rows.highScoreGlobal.lines = lGameStatsGlobal.lines;
-                lCopy.content.rows.highScoreGlobal.user = lGameStatsGlobal.user;
-
-                return lCopy;
-            }
-        );
-
-        setTimesPlayed({ local: lGameStatsLocal.timesPlayed, global: lGameStatsGlobal.timesPlayed });
-    };
 
     const handleNext = () =>
     {
@@ -192,80 +210,68 @@ function GameParams()
             />
 
             <div style = { styles.content }>
-                <CountContainer 
-                    title = "Number of Columns" count = { numColumns } size = { 1 }
-                    styleInner = {{ ...styles.conOption }}
-                >
-                    <TextStandard text = "Select the number of columns" isItalic  style = { styles.prompt } />
 
-                    <div style = { styles.conGridDimension }>
-                        {
-                            Array.from(
-                                { length: gRngCols.max - gRngCols.min + 1 }, (el, i) => { return i + gRngCols.min }
-                            ).map(
-                                (pNumCols, pIndex) =>
-                                {
-                                    const lColourText = pNumCols == numColumns ? theme.selected : gColoursColumnButtons[pIndex];
+                <Container title = "GRID DIMENSIONS" style = {{ alignItems: "center", justifyContent: "center" }}>
 
-                                    const lBorder = `1px solid ${pNumCols == numColumns ? theme.selected : theme.header}`
+                    <TextStandard 
+                        text = "Select the dimensions of the grid using the sliders." 
+                        style = { styles.prompt } isItalic 
+                    />
 
-                                    return ( 
-                                        <ButtonBlocks 
-                                            key = { pIndex } 
-                                            text = { pNumCols.toString().padStart(2, "0") } 
-                                            onPress = { () => { selectColumns(pNumCols); } }
-                                            prColourText = { lColourText }
-                                            prColourBackground = { theme.header }
-                                            style = {{ 
-                                                border: lBorder,
-                                                padding: 5
-                                            }}
-                                        /> 
-                                    )
-                                }
-                            )
-                        }
+                    <div style = {{ height: 300, width: 300 }}>
+
+                        <div style = {{ height: 260, width: 300, flexDirection: "row" }}>
+
+                            <SliderStandard 
+                                prMin = { 0 } prMax = { gRngRows.max } prValue = { numRows } prStep = { 1 } 
+                                prIsVertical prIsVerticalTopDown = { false }
+                                prOnChange = { (val) => { setNumRows(val); } }
+                                prStyleContainer = { styles.sliderContainer }
+                                prStyleProgressBar = {{ borderLeft: `1px solid ${theme.borders}`, borderRight: `1px solid ${theme.borders}`, borderRadius: 0 }}
+                                // prStyleTrack = { styles.sliderTrackVertical }
+                                prShowValue = { false } prShowLabel = { true } prShowStickyValue = { true }
+                                prWidth = { 40 }
+                                prMinAllowed = { gRngRows.min }
+                            />
+
+                            <div style = {{ height: 260, width: 260, padding: 10, justifyContent: "flex-end", alignItems: "flex-start" }}>
+                                <GridDisplayer 
+                                    prGrid = { new Grid(numColumns, numRows) } 
+                                    prMaxWidth = { 250 } prMaxHeight = { 250 }
+                                />
+                            </div>
+
+                        </div>
+
+                        <div style = {{ height: 40, width: 300, flexDirection: "row" }}>
+
+                            <div 
+                                style = {{ 
+                                    height: 40, width: 40, backgroundColor: theme.header, border: `1px solid ${theme.borders}`,
+                                    borderRight: "none", borderTop: "none", color: "white", justifyContent: "center", alignItems: "center"
+                                }}
+                            >
+                                <ClearIcon 
+                                    sx = { { fill: theme.borders, fontSize: 30 } }
+                                />
+                            </div>
+
+                            <SliderStandard 
+                                prMin = { 0 } prMax = { gRngRows.max } prValue = { numColumns } prStep = { 1 }
+                                prOnChange = { (val) => { setNumColumns(val); } }
+                                prStyleContainer = { styles.sliderContainer }
+                                prStyleProgressBar = {{ borderTop: `1px solid ${theme.borders}`, borderBottom: `1px solid ${theme.borders}`, borderRadius: 0 }}
+                                prShowValue = { false } prShowLabel = { true } prShowStickyValue = { true }
+                                prWidth = { 260 }
+                                prMinAllowed = { gRngCols.min } prMaxAllowed = { gRngCols.max }
+                            />
+
+                        </div>
+
                     </div>
-                </CountContainer>
+                </Container>
 
-                <CountContainer 
-                    title = "Number of Rows" count = { numRows } size = { 1 }
-                    styleInner = {{ ...styles.conOption }}
-                >
-                    <TextStandard text = "Select the number of rows" isItalic style = { styles.prompt } />
-
-                    <div style = { styles.conGridDimension }>
-                        {
-                            Array.from(
-                                { length: gRngRows.max - gRngRows.min + 1 }, (el, i) => { return i + gRngRows.min }
-                            ).map(
-                                (pNumRows, pIndex) =>
-                                {
-                                    const lColourText = pNumRows == numRows ? theme.selected : gColoursRowButtons[pIndex];
-
-                                    const lBorder = `1px solid ${pNumRows == numRows ? theme.selected : theme.header}`
-
-                                    return ( 
-                                        <ButtonBlocks 
-                                            key = { pIndex }
-                                            index = { pIndex } 
-                                            text = { pNumRows.toString().padStart(2, "0") } 
-                                            onPress = { () => { selectRows(pNumRows); } }
-                                            prColourText = { lColourText }
-                                            prColourBackground = { theme.header }
-                                            style = {{ 
-                                                border: lBorder,
-                                                padding: 5
-                                            }}
-                                        /> 
-                                    )
-                                }
-                            )
-                        }
-                    </div>
-                </CountContainer>
-
-                <Container style = { styles.conBlocks }>
+                <Container style = { styles.conBlocks } title = "BLOCKS">
                     <TextStandard text = "Select the blocks you want to play with. A block is not selected if it's greyed-out." style = { styles.prompt } isItalic />
                     <div style = { styles.conBlocksInner }>
                         {
@@ -298,7 +304,7 @@ function GameParams()
                     </div>
                 </Container>
 
-                <Container style = { styles.conStats }>
+                <Container style = { styles.conStats } styleOuter = { styles.conStatsOuter } title = "STATS">
                     <TextStandard text = "Stats for the selected game." isItalic />
 
                     <TableStandard 
@@ -362,10 +368,13 @@ const styles =
     {
         flexDirection: "column"
     },
-    conStats:
+    conStatsOuter:
     {
         width: window.innerWidth > 500 ? 500 : globalProps.widthCon,
         maxWidth: "100%",
+    },
+    conStats:
+    {
         rowGap: utilsGlobalStyles.spacingVertN(-1),
         flexGrow: 0
     },
@@ -381,7 +390,12 @@ const styles =
     countLabel: 
     {
         border: "none"
-    }
+    },
+    sliderContainer:
+    {
+        border: "none",
+        borderRadius: 0
+    },
 };
 
 const gColoursColumnButtons = Array.from({ length: gRngCols.max - gRngCols.min + 1 }, (el, i) => { return i }).map(

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 
 import globalProps, { utilsGlobalStyles } from "../../styles.js";
+import TextStandard from '../text_standard/TextStandard.jsx';
 import ThemeContext from "../../contexts/ThemeContext.js";
 
 /* 
@@ -21,7 +22,7 @@ import ThemeContext from "../../contexts/ThemeContext.js";
       correspond to a value of Header.buttonNames.
     > style: an optional styling object for the container of the content.
 */
-function Container({ children, style })
+function Container({ children, styleOuter, style, title })
 {
     // Acquire global theme.
     const { themeName } = useContext(ThemeContext);
@@ -31,11 +32,21 @@ function Container({ children, style })
         <div 
             style = {{ 
                 ...styles.container, width: globalProps.widthCon, backgroundColor: theme.content,
-                borderColor: theme.borders, ...style,
+                borderColor: theme.borders, ...styleOuter
             }}
         >
+            {
+                title && (
+                    <TextStandard 
+                        text = { title } size = { 1 } isBold
+                        style = {{ ...styles.title, backgroundColor: theme.header }}
+                    />
+                )
+            }
 
-            { children }
+            <div style = { { ...styles.conInner, ...style, } }>
+                { children }
+            </div>
 
         </div>
     );
@@ -44,22 +55,37 @@ function Container({ children, style })
 Container.propTypes =
 {
     children: PropTypes.node,
+    styleOuter: PropTypes.object,
     style: PropTypes.object,
+    title: PropTypes.string
 };
 
 Container.defaultProps =
 {
-    style: {}
+    title: ""
 }
 
 const styles =
 {
     container:
     {
+        flexShrink: 0,
+        flexDirection: "column",
         width: globalProps.widthCon,
-        padding: utilsGlobalStyles.spacingVertN(-1),
         borderRadius: 2 * globalProps.borderRadiusStandard,
-        border: "1px solid"
+        border: "1px solid",
+        overflow: "hidden"
+    },
+    conInner:
+    {
+        padding: utilsGlobalStyles.spacingVertN(-1),
+        flexDirection: "column",
+    },
+    title:
+    {
+        width: "100%",
+        padding: "12px 15px",
+        borderBottom: "1px solid"
     }
 };
 

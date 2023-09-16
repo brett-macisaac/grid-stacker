@@ -56,7 +56,7 @@ function SetInLocalStorage(aKey, aValue)
 {
     if (aValue instanceof Map)
     {
-        console.log("Storing a map in local storage.");
+        //console.log("Storing a map in local storage.");
 
         localStorage[aKey] = JSON.stringify(Array.from(aValue));
     }
@@ -78,7 +78,7 @@ function GetFromLocalStorage(aKey, aAlt = "")
 {
     if (!localStorage.hasOwnProperty(aKey))
     {
-        console.log("localStorage doesn't contain data associated with this key.");
+        //console.log("localStorage doesn't contain data associated with this key.");
     }
 
     const lString = localStorage[aKey];
@@ -92,7 +92,7 @@ function GetFromLocalStorage(aKey, aAlt = "")
 * See 'https://www.freecodecamp.org/news/javascript-debounce-example/' for a more in-depth explanation.
 
 * Parameters:
-    > aKey: the function to be debounced.
+    > pFunc: the function to be debounced.
     > pLengthGap: the minimum gap between calls to pFunc.
 */
 function Debounce(pFunc, pLengthGap)

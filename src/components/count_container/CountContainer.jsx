@@ -68,6 +68,7 @@ const styles =
 {
     outerContainer:
     {
+        flexShrink: 0,
         flexDirection: "column",
         width: globalProps.widthCon,
         border: "1px solid",
