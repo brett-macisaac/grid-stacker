@@ -20,3 +20,15 @@ if ("serviceWorker" in navigator)
 {
     registerSW({ immediate: true });
 }
+// Register the service worker (allows for offline use).
+// if ("serviceWorker" in navigator) 
+// {
+//     window.addEventListener(
+//         'load', 
+//         () => 
+//         {
+//             console.log("Registering!");
+//             navigator.serviceWorker.register("/sw.js");
+//         }
+//     )
+// }

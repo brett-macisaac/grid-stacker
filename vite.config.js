@@ -23,7 +23,7 @@ const manifest =
             purpose: "any maskable"
         }
     ],
-    start_url: gTesting ? "http://localhost:5173/" : "https://www.grid-stacker.com/",
+    start_url: gTesting ? "http://localhost:4173/" : "https://www.grid-stacker.com/",
     display: "standalone",
     theme_color: "#000000",
     background_color: "#000000"
@@ -32,6 +32,18 @@ const manifest =
 // https://vitejs.dev/config/
 export default defineConfig(
     {
+        build: {
+            assetsInlineLimit: 0,
+            rollupOptions: {
+                output: {
+                    // Prevent renaming of files with hashes.
+                    entryFileNames: `assets/[name].js`,
+                    chunkFileNames: `assets/[name].js`,
+                    assetFileNames: `assets/[name].[ext]`
+                }
+            },
+            watch: false
+        },
         plugins: [
             react(),
             VitePWA({ 
@@ -41,6 +53,9 @@ export default defineConfig(
                     enabled: true,
                     type: "module",
                 },
+                workbox: {
+                    globPatterns: [ '**/*.{js,css,html,mp3,webp}' ],
+                }
             })
         ],
     }
