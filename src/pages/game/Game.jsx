@@ -908,11 +908,13 @@ function Game()
         if (!lIsSoundActive)
             return;
 
-        //const lSound = `./src/assets/sounds/typewriter_${utils.GetRandom(1, 5)}.mp3`
-        const lSound = sounds[utils.GetRandom(1, sounds.length - 1)];
+        const lSoundStr = sounds[utils.GetRandom(1, sounds.length - 1)];
 
-        // For now, use lSound.
-        new Audio(lSound).play();
+        let lSoundObj = new Audio(lSoundStr);
+
+        lSoundObj.volume = 0.02;
+
+        lSoundObj.play();
     };
 
     const handleKeyDown = (pEvent) =>
