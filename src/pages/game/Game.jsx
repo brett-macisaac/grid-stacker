@@ -907,8 +907,8 @@ function Game()
         async (pSound) =>
         {
             // Disable sound on iOS/MAC due to performance issues.
-            // if (/(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent))
-            //     return;
+            if (/(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent))
+                return;
 
             if (!lIsSoundActive)
                 return;

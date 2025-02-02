@@ -16,6 +16,8 @@ Installing the app as a PWA will offer a better gaming experience. The game also
 No future updates are expected; however, I plan to rewrite the project in TypeScript with additional features and fixes. Moreover, I would one day like to release a mobile app for Android/iOS devices to deliver a better user experience.
 
 # Note for iOS/MAC Users
-The game's sound effects seem to result in poor performance on Apple devices; however, if the sound effects are turned off from the settings, the game runs smoothly. This isn't ideal of course, as the 'typewriter' sound effects are rather satisfying, so I'd recommend an Android or Windows device for the full experience.
+The game's sound effects seem to result in poor performance on iOS devices, in addition to the volume being excessively high. For now, sound effects have been disabled on both iOS and MAC devices (note: MAC devices haven't been tested yet).
 
-Another issue I've experience with iOS/MAC devices is that the slider component doesn't work as expected: you can still get it to work by clicking along the slider's length, but you can't use a 'drag' gesture as one would expect from a slider.
+This isn't ideal of course, as the 'typewriter' sound effects are rather satisfying, so I'd recommend an Android or Windows device for the full experience.
+
+Another issue I've experience with iOS devices is that the slider component doesn't work as expected: you can still get it to work by clicking along the slider's length, but you can't use a 'drag' gesture as one would expect from a slider.
