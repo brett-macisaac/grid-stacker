@@ -23,7 +23,7 @@ class ApiRequestor
             headers: {
                 "Content-Type": "application/json"
             },
-            timeout: 1500,
+            timeout: 5000,
             validateStatus: () => true
         }
     );
