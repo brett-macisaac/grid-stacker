@@ -7,6 +7,10 @@ This level of customisation results in over 16,000 different game configurations
 
 A major complaint I have with most iterations of Tetris is that the games can tend to drag on for a significant amount of time. This isn't necessarily a problem, but it restricts the user's ability to play the game, such as if they're short on time. With Grid Stacker, the user can choose smaller grid sizes, such as 7x4, as opposed to the traditional 20x10, which not only offers interesting new gameplay experiences, but also significantly shortens the length of the game.
 
+# Example 
+
+![Example GIF](readme_resources/example.gif)
+
 # Where To Play
 This project has been deployed on the [web](https://www.grid-stacker.com/) and can be played on any device with a modern web browser. 
 
