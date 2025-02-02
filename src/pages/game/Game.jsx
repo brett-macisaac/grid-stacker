@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 
 import globalProps, { utilsGlobalStyles } from '../../styles';
 import optionsHeaderButtons from '../../components/options_header_buttons.jsx';
@@ -903,19 +903,26 @@ function Game()
         return (windowSize.width > windowSize.height);
     };
 
-    const playSound = (pSound) =>
-    {
-        if (!lIsSoundActive)
-            return;
+    const playSound = useCallback(
+        async (pSound) =>
+        {
+            // Disable sound on iOS/MAC due to performance issues.
+            // if (/(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent))
+            //     return;
 
-        const lSoundStr = sounds[utils.GetRandom(1, sounds.length - 1)];
+            if (!lIsSoundActive)
+                return;
 
-        let lSoundObj = new Audio(lSoundStr);
+            const lSoundStr = sounds[utils.GetRandom(1, sounds.length - 1)];
 
-        lSoundObj.volume = 0.02;
+            let lSoundObj = new Audio(lSoundStr);
 
-        lSoundObj.play();
-    };
+            lSoundObj.volume = 0.03;
+
+            await lSoundObj.play();
+        },
+        []
+    );
 
     const handleKeyDown = (pEvent) =>
     {
